@@ -1,0 +1,21 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "dalhus-portfolio",
+  "main": "./src/index.js",
+  "compatibility_date": "2026-08-18",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "not_found_handling": "404-page"
+  },
+  "vars": {
+    // SmugMug-brukernavnet ditt — den delen som står i URL-en til siden din,
+    // f.eks. "cmac" for cmac.smugmug.com. Bytt ut før deploy.
+    "SMUGMUG_NICKNAME": "DITT-BRUKERNAVN"
+  },
+  // SMUGMUG_API_KEY settes som secret, ikke her:
+  //   npx wrangler secret put SMUGMUG_API_KEY
+  "observability": {
+    "enabled": true
+  }
+}

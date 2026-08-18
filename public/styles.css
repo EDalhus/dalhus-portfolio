@@ -1,0 +1,945 @@
+/* ==========================================================================
+   Windows 95 theme — håndskrevet, ingen eksterne avhengigheter.
+   Fargene under er de originale systemfargene fra Win95.
+   ========================================================================== */
+
+:root {
+  --w95-desktop: #008080;
+  --w95-face: #c0c0c0;
+  --w95-light: #dfdfdf;
+  --w95-white: #ffffff;
+  --w95-shadow: #808080;
+  --w95-dark: #000000;
+  --w95-title-a: #000080;
+  --w95-title-b: #1084d0;
+  --w95-title-text: #ffffff;
+  --w95-text: #000000;
+  --w95-disabled: #808080;
+  --w95-select: #000080;
+  --taskbar-height: 34px;
+  --font-ui: "MS Sans Serif", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--w95-text);
+  background-color: var(--w95-desktop);
+  /* Diskret dither-mønster, som en gammel skrivebordsbakgrunn */
+  background-image:
+    radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 4px 4px;
+  -webkit-font-smoothing: none;
+  overflow-x: hidden;
+}
+
+/* --- Bevel-hjelpere ------------------------------------------------------ */
+
+.bevel-out {
+  border: 1px solid;
+  border-color: var(--w95-white) var(--w95-dark) var(--w95-dark) var(--w95-white);
+  box-shadow:
+    inset 1px 1px 0 var(--w95-light),
+    inset -1px -1px 0 var(--w95-shadow);
+}
+
+.field-sunken {
+  background: var(--w95-white);
+  border: 1px solid;
+  border-color: var(--w95-shadow) var(--w95-white) var(--w95-white) var(--w95-shadow);
+  box-shadow:
+    inset 1px 1px 0 var(--w95-dark),
+    inset -1px -1px 0 var(--w95-light);
+}
+
+/* --- Skrivebord ---------------------------------------------------------- */
+
+.desktop {
+  min-height: 100%;
+  padding: 24px 16px calc(var(--taskbar-height) + 32px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+/* --- Vindu --------------------------------------------------------------- */
+
+.window {
+  width: min(720px, 100%);
+  background: var(--w95-face);
+  padding: 3px;
+  border: 1px solid;
+  border-color: var(--w95-white) var(--w95-dark) var(--w95-dark) var(--w95-white);
+  box-shadow:
+    inset 1px 1px 0 var(--w95-light),
+    inset -1px -1px 0 var(--w95-shadow),
+    4px 4px 0 rgba(0, 0, 0, 0.28);
+}
+
+.window[hidden] {
+  display: none;
+}
+
+.window.is-maximized {
+  width: 100%;
+  max-width: none;
+}
+
+.title-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 2px 2px 3px;
+  background: linear-gradient(90deg, var(--w95-title-a) 0%, var(--w95-title-b) 100%);
+  color: var(--w95-title-text);
+  user-select: none;
+}
+
+.title-bar-icon {
+  width: 16px;
+  height: 14px;
+  flex: none;
+  background:
+    linear-gradient(var(--w95-title-a), var(--w95-title-a)) 0 0 / 100% 4px no-repeat,
+    var(--w95-white);
+  border: 1px solid var(--w95-dark);
+}
+
+.title-bar-text {
+  flex: 1 1 auto;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.title-bar-controls {
+  display: flex;
+  gap: 2px;
+  flex: none;
+}
+
+/* --- Knapper ------------------------------------------------------------- */
+
+.btn {
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--w95-text);
+  background: var(--w95-face);
+  padding: 3px 12px;
+  min-width: 68px;
+  border: 1px solid;
+  border-color: var(--w95-white) var(--w95-dark) var(--w95-dark) var(--w95-white);
+  box-shadow:
+    inset 1px 1px 0 var(--w95-light),
+    inset -1px -1px 0 var(--w95-shadow);
+  cursor: pointer;
+}
+
+.btn:active,
+.btn.is-pressed {
+  border-color: var(--w95-dark) var(--w95-white) var(--w95-white) var(--w95-dark);
+  box-shadow:
+    inset 1px 1px 0 var(--w95-shadow),
+    inset -1px -1px 0 var(--w95-light);
+  padding: 4px 11px 2px 13px;
+}
+
+.btn:focus-visible {
+  outline: 1px dotted var(--w95-dark);
+  outline-offset: -4px;
+}
+
+.btn-link {
+  display: inline-block;
+  text-decoration: none;
+  text-align: center;
+}
+
+.tb-btn {
+  width: 18px;
+  height: 16px;
+  min-width: 0;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  background: var(--w95-face);
+  border: 1px solid;
+  border-color: var(--w95-white) var(--w95-dark) var(--w95-dark) var(--w95-white);
+  box-shadow:
+    inset 1px 1px 0 var(--w95-light),
+    inset -1px -1px 0 var(--w95-shadow);
+  cursor: pointer;
+}
+
+.tb-btn:active {
+  border-color: var(--w95-dark) var(--w95-white) var(--w95-white) var(--w95-dark);
+  box-shadow:
+    inset 1px 1px 0 var(--w95-shadow),
+    inset -1px -1px 0 var(--w95-light);
+}
+
+.glyph {
+  display: block;
+  background: var(--w95-dark);
+}
+
+.glyph-min {
+  width: 7px;
+  height: 2px;
+  margin-top: 6px;
+}
+
+.glyph-max {
+  width: 9px;
+  height: 8px;
+  background:
+    linear-gradient(var(--w95-dark), var(--w95-dark)) 0 0 / 100% 2px no-repeat,
+    linear-gradient(var(--w95-dark), var(--w95-dark)) 0 0 / 1px 100% no-repeat,
+    linear-gradient(var(--w95-dark), var(--w95-dark)) 100% 0 / 1px 100% no-repeat,
+    linear-gradient(var(--w95-dark), var(--w95-dark)) 0 100% / 100% 1px no-repeat;
+}
+
+.glyph-close {
+  width: 8px;
+  height: 8px;
+  background: none;
+  position: relative;
+}
+
+.glyph-close::before,
+.glyph-close::after {
+  content: "";
+  position: absolute;
+  inset: 3px -1px auto;
+  height: 2px;
+  background: var(--w95-dark);
+}
+
+.glyph-close::before {
+  transform: rotate(45deg);
+}
+
+.glyph-close::after {
+  transform: rotate(-45deg);
+}
+
+/* --- Menylinje ----------------------------------------------------------- */
+
+.menu-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 2px 3px;
+  border-bottom: 1px solid var(--w95-shadow);
+  box-shadow: 0 1px 0 var(--w95-white);
+  margin-bottom: 3px;
+}
+
+.menu-items {
+  display: flex;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.menu-item {
+  display: block;
+  padding: 2px 7px;
+  cursor: default;
+  user-select: none;
+}
+
+.menu-item:hover {
+  background: var(--w95-select);
+  color: var(--w95-white);
+}
+
+.lang-switch {
+  display: flex;
+  gap: 2px;
+  padding-right: 2px;
+}
+
+.btn-lang {
+  min-width: 34px;
+  padding: 2px 8px;
+  font-size: 12px;
+}
+
+.btn-lang.is-active {
+  border-color: var(--w95-dark) var(--w95-white) var(--w95-white) var(--w95-dark);
+  box-shadow:
+    inset 1px 1px 0 var(--w95-shadow),
+    inset -1px -1px 0 var(--w95-light);
+  background-color: #9c9c9c;
+  background-image:
+    repeating-conic-gradient(var(--w95-light) 0% 25%, transparent 0% 50%);
+  background-size: 2px 2px;
+  font-weight: 700;
+  padding: 3px 7px 1px 9px;
+}
+
+/* --- Vindusinnhold ------------------------------------------------------- */
+
+.window-body {
+  padding: 10px 11px 12px;
+}
+
+.intro {
+  padding: 12px 14px;
+  margin-bottom: 14px;
+}
+
+.intro-name {
+  margin: 0 0 4px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.intro-tagline {
+  margin: 0;
+  color: #3a3a3a;
+}
+
+.section-label {
+  margin: 0 0 5px;
+  font-weight: 700;
+}
+
+/* --- Fil-/prosjektliste -------------------------------------------------- */
+
+.file-list {
+  padding: 6px;
+  display: grid;
+  gap: 2px;
+}
+
+.file-item {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  gap: 10px;
+  align-items: start;
+  padding: 7px 8px;
+  color: inherit;
+  text-decoration: none;
+  border: 1px dotted transparent;
+}
+
+.file-item:hover {
+  border-color: var(--w95-shadow);
+  background: #ecf3ff;
+}
+
+.file-item:focus-visible {
+  outline: none;
+  border: 1px dotted var(--w95-white);
+  background: var(--w95-select);
+  color: var(--w95-white);
+}
+
+.file-item:focus-visible .file-desc,
+.file-item:focus-visible .file-url {
+  color: #d7d7ff;
+}
+
+.file-icon {
+  width: 32px;
+  height: 28px;
+  flex: none;
+  position: relative;
+  margin-top: 2px;
+}
+
+/* Mappeikon tegnet i ren CSS */
+.file-icon::before {
+  content: "";
+  position: absolute;
+  left: 1px;
+  top: 3px;
+  width: 13px;
+  height: 4px;
+  background: #d9a520;
+  border: 1px solid #6b4e00;
+  border-bottom: none;
+  border-radius: 1px 3px 0 0;
+}
+
+.file-icon::after {
+  content: "";
+  position: absolute;
+  left: 1px;
+  top: 6px;
+  width: 28px;
+  height: 19px;
+  background: linear-gradient(180deg, #ffd964 0%, #e5aa1d 100%);
+  border: 1px solid #6b4e00;
+  border-radius: 0 2px 2px 2px;
+  box-shadow: inset 1px 1px 0 #fff2bd;
+}
+
+.file-item.is-link .file-icon::after {
+  background: linear-gradient(180deg, #f2f2f2 0%, #cfcfcf 100%);
+  border-color: #4a4a4a;
+  box-shadow: inset 1px 1px 0 #ffffff;
+}
+
+.file-item.is-link .file-icon::before {
+  background: #cfcfcf;
+  border-color: #4a4a4a;
+}
+
+.file-text {
+  min-width: 0;
+}
+
+.file-name {
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.file-desc {
+  margin: 1px 0 0;
+  color: #3a3a3a;
+}
+
+.file-url {
+  margin: 2px 0 0;
+  font-size: 11px;
+  color: var(--w95-shadow);
+  word-break: break-all;
+}
+
+.file-tags {
+  margin: 5px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.file-tags li {
+  font-size: 11px;
+  line-height: 1;
+  padding: 3px 6px;
+  background: var(--w95-face);
+  border: 1px solid;
+  border-color: var(--w95-white) var(--w95-shadow) var(--w95-shadow) var(--w95-white);
+}
+
+/* --- Statuslinje --------------------------------------------------------- */
+
+.status-bar {
+  display: flex;
+  gap: 3px;
+  margin-top: 4px;
+  padding: 0 1px 1px;
+}
+
+.status-field {
+  padding: 2px 6px;
+  border: 1px solid;
+  border-color: var(--w95-shadow) var(--w95-white) var(--w95-white) var(--w95-shadow);
+  font-size: 12px;
+}
+
+.status-field:first-child {
+  min-width: 150px;
+}
+
+.status-field:last-child {
+  flex: 1;
+}
+
+/* --- Dialog -------------------------------------------------------------- */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 40;
+  padding: 16px;
+}
+
+.modal-backdrop[hidden] {
+  display: none;
+}
+
+.dialog {
+  width: min(360px, 100%);
+}
+
+.dialog-body {
+  padding: 18px 16px 14px;
+  text-align: center;
+}
+
+.dialog-body p {
+  margin: 0 0 16px;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: center;
+}
+
+/* --- Oppgavelinje -------------------------------------------------------- */
+
+.taskbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--taskbar-height);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 4px;
+  background: var(--w95-face);
+  border-top: 1px solid var(--w95-white);
+  box-shadow: inset 0 1px 0 var(--w95-light);
+  z-index: 30;
+}
+
+.start-button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  padding: 3px 8px 3px 5px;
+  font-weight: 700;
+}
+
+.start-logo {
+  width: 16px;
+  height: 15px;
+  flex: none;
+  background:
+    linear-gradient(135deg, #ff3b30 0 50%, transparent 0) 0 0 / 8px 7px no-repeat,
+    linear-gradient(#4cd964, #4cd964) 9px 0 / 7px 7px no-repeat,
+    linear-gradient(#0a84ff, #0a84ff) 0 8px / 8px 7px no-repeat,
+    linear-gradient(#ffcc00, #ffcc00) 9px 8px / 7px 7px no-repeat;
+}
+
+.taskbar-divider {
+  width: 2px;
+  height: 22px;
+  border-left: 1px solid var(--w95-shadow);
+  border-right: 1px solid var(--w95-white);
+  flex: none;
+}
+
+.task-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  max-width: 200px;
+  padding: 3px 10px;
+  text-align: left;
+}
+
+.task-button span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task-button.is-active {
+  border-color: var(--w95-dark) var(--w95-white) var(--w95-white) var(--w95-dark);
+  box-shadow:
+    inset 1px 1px 0 var(--w95-shadow),
+    inset -1px -1px 0 var(--w95-light);
+  background-color: #b8b8b8;
+  background-image:
+    repeating-conic-gradient(var(--w95-white) 0% 25%, transparent 0% 50%);
+  background-size: 2px 2px;
+  font-weight: 700;
+}
+
+.task-icon {
+  width: 14px;
+  height: 12px;
+  flex: none;
+  background:
+    linear-gradient(var(--w95-title-a), var(--w95-title-a)) 0 0 / 100% 3px no-repeat,
+    var(--w95-white);
+  border: 1px solid var(--w95-dark);
+}
+
+.tray {
+  margin-left: auto;
+  padding: 2px 8px;
+  border: 1px solid;
+  border-color: var(--w95-shadow) var(--w95-white) var(--w95-white) var(--w95-shadow);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Mobil --------------------------------------------------------------- */
+
+@media (max-width: 520px) {
+  .desktop {
+    padding: 10px 8px calc(var(--taskbar-height) + 20px);
+  }
+
+  .window {
+    box-shadow:
+      inset 1px 1px 0 var(--w95-light),
+      inset -1px -1px 0 var(--w95-shadow),
+      2px 2px 0 rgba(0, 0, 0, 0.28);
+  }
+
+  .menu-items {
+    display: none;
+  }
+
+  .menu-bar {
+    justify-content: flex-end;
+  }
+
+  .intro-name {
+    font-size: 19px;
+  }
+
+  .status-field:first-child {
+    min-width: 0;
+  }
+
+  .task-button {
+    max-width: 120px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+
+/* ==========================================================================
+   Galleri (SmugMug) — vindu 2
+   ========================================================================== */
+
+.title-bar-icon-photo {
+  background:
+    linear-gradient(135deg, #1a7f37 0 40%, transparent 0) 0 0 / 100% 100% no-repeat,
+    linear-gradient(#7fc7ff, #ffffff);
+}
+
+.task-icon-photo {
+  background:
+    linear-gradient(135deg, #1a7f37 0 40%, transparent 0) 0 0 / 100% 100% no-repeat,
+    linear-gradient(#7fc7ff, #ffffff);
+}
+
+/* --- Faner ---------------------------------------------------------------- */
+
+.tabs {
+  display: flex;
+  gap: 2px;
+  padding-left: 2px;
+  position: relative;
+  z-index: 1;
+  margin-bottom: -1px;
+}
+
+.tab {
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--w95-text);
+  background: var(--w95-face);
+  padding: 4px 14px 5px;
+  border: 1px solid;
+  border-color: var(--w95-white) var(--w95-dark) transparent var(--w95-white);
+  border-radius: 3px 3px 0 0;
+  box-shadow: inset 1px 1px 0 var(--w95-light);
+  cursor: pointer;
+  position: relative;
+  top: 2px;
+}
+
+.tab.is-active {
+  top: 0;
+  padding: 5px 16px 6px;
+  font-weight: 700;
+  z-index: 2;
+}
+
+.tab:focus-visible {
+  outline: 1px dotted var(--w95-dark);
+  outline-offset: -4px;
+}
+
+.tab-panel {
+  padding: 10px;
+  min-height: 180px;
+  background: var(--w95-white);
+}
+
+/* --- Meldinger og notiser ------------------------------------------------- */
+
+.gallery-message {
+  margin: 0;
+  padding: 26px 8px;
+  text-align: center;
+  color: #3a3a3a;
+}
+
+.gallery-actions {
+  margin: 0;
+  padding: 4px 0 10px;
+  text-align: center;
+}
+
+.notice {
+  display: grid;
+  grid-template-columns: 26px 1fr;
+  gap: 10px;
+  align-items: start;
+  margin-bottom: 10px;
+  padding: 9px 11px;
+  background: #ffffe1;
+  border: 1px solid var(--w95-dark);
+}
+
+.notice-error {
+  background: #ffe9e9;
+}
+
+.notice-icon {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--w95-title-a);
+  color: var(--w95-white);
+  font-weight: 700;
+  font-style: italic;
+  font-size: 15px;
+}
+
+.notice-error .notice-icon {
+  background: #a80000;
+  font-style: normal;
+}
+
+.notice-text p {
+  margin: 3px 0 0;
+  font-size: 12px;
+  color: #3a3a3a;
+  word-break: break-word;
+}
+
+/* --- Bilderutenett -------------------------------------------------------- */
+
+.tile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+  gap: 10px;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 4px 7px;
+  color: inherit;
+  text-decoration: none;
+  border: 1px dotted transparent;
+}
+
+.tile:hover {
+  border-color: var(--w95-shadow);
+  background: #ecf3ff;
+}
+
+.tile:focus-visible {
+  outline: none;
+  border: 1px dotted var(--w95-white);
+  background: var(--w95-select);
+  color: var(--w95-white);
+}
+
+.tile:focus-visible .tile-meta {
+  color: #d7d7ff;
+}
+
+.tile-frame {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  display: block;
+  background: var(--w95-face);
+  border: 1px solid;
+  border-color: var(--w95-shadow) var(--w95-white) var(--w95-white) var(--w95-shadow);
+  box-shadow:
+    inset 1px 1px 0 var(--w95-dark),
+    inset -1px -1px 0 var(--w95-light);
+  overflow: hidden;
+}
+
+.tile-img,
+.album-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Plassholder i demomodus: klassisk dither-flate */
+.tile-placeholder {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: #a8a8a8;
+  background-image:
+    repeating-conic-gradient(var(--w95-light) 0% 25%, transparent 0% 50%);
+  background-size: 4px 4px;
+}
+
+.tile-caption {
+  font-size: 12px;
+  line-height: 1.25;
+  text-align: center;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.tile-meta {
+  font-size: 11px;
+  color: var(--w95-shadow);
+}
+
+.tile.is-demo {
+  cursor: default;
+}
+
+/* --- Albumliste ----------------------------------------------------------- */
+
+.album-list {
+  display: grid;
+  gap: 3px;
+}
+
+.album-row {
+  display: grid;
+  grid-template-columns: 76px 1fr;
+  gap: 11px;
+  align-items: start;
+  padding: 7px 8px;
+  color: inherit;
+  text-decoration: none;
+  border: 1px dotted transparent;
+}
+
+.album-row:hover {
+  border-color: var(--w95-shadow);
+  background: #ecf3ff;
+}
+
+.album-row:focus-visible {
+  outline: none;
+  border: 1px dotted var(--w95-white);
+  background: var(--w95-select);
+  color: var(--w95-white);
+}
+
+.album-row:focus-visible .album-meta,
+.album-row:focus-visible .album-desc {
+  color: #d7d7ff;
+}
+
+.album-cover {
+  width: 76px;
+  aspect-ratio: 4 / 3;
+  display: block;
+  background: var(--w95-face);
+  border: 1px solid;
+  border-color: var(--w95-shadow) var(--w95-white) var(--w95-white) var(--w95-shadow);
+  box-shadow:
+    inset 1px 1px 0 var(--w95-dark),
+    inset -1px -1px 0 var(--w95-light);
+  overflow: hidden;
+}
+
+.album-text {
+  min-width: 0;
+  display: block;
+}
+
+.album-name {
+  display: block;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.album-meta {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--w95-shadow);
+}
+
+.album-desc {
+  margin: 3px 0 0;
+  font-size: 12px;
+  color: #3a3a3a;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (max-width: 520px) {
+  .tile-grid {
+    grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+    gap: 7px;
+  }
+
+  .album-row {
+    grid-template-columns: 60px 1fr;
+    gap: 9px;
+  }
+
+  .album-cover {
+    width: 60px;
+  }
+
+  .tab {
+    padding: 4px 9px 5px;
+  }
+
+  .tab.is-active {
+    padding: 5px 11px 6px;
+  }
+}

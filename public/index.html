@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="no">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Eirik Dalhus</title>
+    <meta name="description" content="Portefølje og prosjekter — Eirik Dalhus." />
+    <meta name="color-scheme" content="light" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="preconnect" href="https://photos.smugmug.com" crossorigin />
+    <meta property="og:title" content="Eirik Dalhus" />
+    <meta property="og:description" content="Portefølje og prosjekter." />
+    <meta property="og:type" content="website" />
+  </head>
+  <body>
+    <main class="desktop">
+      <!-- ================= Vindu 1: portefølje ================= -->
+      <section class="window" data-window="portfolio" role="region" aria-label="Portefølje">
+        <div class="title-bar">
+          <span class="title-bar-icon" aria-hidden="true"></span>
+          <h1 class="title-bar-text">Eirik Dalhus — <span data-i18n="window.title">Portefølje</span></h1>
+          <div class="title-bar-controls">
+            <button type="button" class="tb-btn" data-action="minimize" aria-label="Minimer">
+              <span class="glyph glyph-min" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="tb-btn" data-action="maximize" aria-label="Maksimer">
+              <span class="glyph glyph-max" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="tb-btn" data-action="close" aria-label="Lukk">
+              <span class="glyph glyph-close" aria-hidden="true"></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="menu-bar">
+          <ul class="menu-items">
+            <li><span class="menu-item" data-menu="file"></span></li>
+            <li><span class="menu-item" data-menu="edit"></span></li>
+            <li><span class="menu-item" data-menu="view"></span></li>
+            <li><span class="menu-item" data-menu="help"></span></li>
+          </ul>
+          <div class="lang-switch" role="group" aria-label="Language / Språk">
+            <button type="button" class="btn btn-lang is-active" data-lang="no" aria-pressed="true">NO</button>
+            <button type="button" class="btn btn-lang" data-lang="en" aria-pressed="false">EN</button>
+          </div>
+        </div>
+
+        <div class="window-body">
+          <div class="intro field-sunken">
+            <p class="intro-name">Eirik Dalhus</p>
+            <p class="intro-tagline" data-i18n="intro.tagline">
+              Bygger ting på nett. Prosjektene ligger i mappen under.
+            </p>
+          </div>
+
+          <p class="section-label" data-i18n="projects.heading">Prosjekter</p>
+
+          <div class="field-sunken file-list" id="project-list">
+            <!-- Prosjektene rendres av app.js -->
+          </div>
+        </div>
+
+        <div class="status-bar">
+          <span class="status-field" id="status-count"></span>
+          <span class="status-field" data-i18n="status.hint">Klikk for å åpne</span>
+        </div>
+      </section>
+
+      <!-- ================= Vindu 2: SmugMug-galleri ================= -->
+      <section class="window" data-window="gallery" role="region" aria-label="Bilder">
+        <div class="title-bar">
+          <span class="title-bar-icon title-bar-icon-photo" aria-hidden="true"></span>
+          <h2 class="title-bar-text" data-i18n="gallery.title">Bilder — SmugMug</h2>
+          <div class="title-bar-controls">
+            <button type="button" class="tb-btn" data-action="minimize" aria-label="Minimer">
+              <span class="glyph glyph-min" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="tb-btn" data-action="maximize" aria-label="Maksimer">
+              <span class="glyph glyph-max" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="tb-btn" data-action="close" aria-label="Lukk">
+              <span class="glyph glyph-close" aria-hidden="true"></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="window-body">
+          <div class="tabs" role="tablist">
+            <button type="button" class="tab is-active" data-tab="photos" role="tab" aria-selected="true">
+              Siste bilder
+            </button>
+            <button type="button" class="tab" data-tab="albums" role="tab" aria-selected="false">
+              Siste album
+            </button>
+          </div>
+
+          <div class="tab-panel field-sunken" id="gallery-body" role="tabpanel">
+            <!-- Fylles av gallery.js -->
+          </div>
+        </div>
+
+        <div class="status-bar">
+          <span class="status-field" id="gallery-status"></span>
+          <span class="status-field" data-i18n="gallery.openOriginal">Åpne på SmugMug</span>
+        </div>
+      </section>
+
+      <!-- "Slå av"-dialog -->
+      <div class="modal-backdrop" id="shutdown-modal" hidden>
+        <div class="window dialog" role="dialog" aria-modal="true" aria-labelledby="dlg-title">
+          <div class="title-bar">
+            <span class="title-bar-icon" aria-hidden="true"></span>
+            <h2 class="title-bar-text" id="dlg-title" data-i18n="dialog.title">Avslutt Windows</h2>
+          </div>
+          <div class="window-body dialog-body">
+            <p data-i18n="dialog.body">Det er nå trygt å slå av maskinen.</p>
+            <div class="dialog-actions">
+              <button type="button" class="btn" id="dlg-ok" data-i18n="dialog.ok">OK</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="taskbar">
+      <button type="button" class="btn start-button" id="start-button">
+        <span class="start-logo" aria-hidden="true"></span>
+        <span>Start</span>
+      </button>
+      <div class="taskbar-divider" aria-hidden="true"></div>
+      <button type="button" class="btn task-button is-active" data-window-target="portfolio">
+        <span class="task-icon" aria-hidden="true"></span>
+        <span>Eirik Dalhus</span>
+      </button>
+      <button type="button" class="btn task-button is-active" data-window-target="gallery">
+        <span class="task-icon task-icon-photo" aria-hidden="true"></span>
+        <span>SmugMug</span>
+      </button>
+      <div class="tray">
+        <span class="tray-clock" id="clock">--:--</span>
+      </div>
+    </footer>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
