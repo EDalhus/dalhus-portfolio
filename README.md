@@ -19,7 +19,8 @@ Ingen byggesteg, ingen rammeverk, ingen avhengigheter i nettleseren.
     ├── index.html
     ├── styles.css        # Hele Win95-temaet
     ├── config.js         # Prosjekter, tekster, gallerinnstillinger
-    ├── app.js            # Skall: språk, vinduer, oppgavelinje
+    ├── app.js            # Skall: språk, klokke, klikkelyder
+    ├── windows.js         # Vindusbehandler: åpne/dra/endre størrelse, Start-meny
     ├── gallery.js        # Tegner SmugMug-galleriet
     ├── _headers          # Sikkerhetsheadere for de statiske filene
     ├── 404.html
@@ -105,6 +106,21 @@ ha det raskere, senk verdiene i `handleSmugmugRequest`.
 Anonym tilgang med API-nøkkel når bare **offentlige** bilder. Private eller
 skjulte album krever full OAuth 1.0a-signering med en access token — en god del
 mer arbeid, og det krever et sted å lagre token (f.eks. Workers KV).
+
+## Skrivebordet
+
+Over 520px bredde oppfører vinduene seg som ekte Windows 95-vinduer:
+
+- Skrivebordsikonene («Portfolio», «SmugMug») åpner vinduene — de er lukket
+  til man klikker.
+- Tittellinjen kan dras for å flytte vinduet.
+- Hjørnene kan dras for å endre størrelse (minimum ca. 280×220px).
+- Start-knappen åpner en Start-meny som henger fast over oppgavelinjen og
+  ikke flytter seg ved rulling.
+- Klikk spiller av en kort, syntetisert klikkelyd (Web Audio, ingen lydfil).
+
+Under 520px faller alt tilbake til vanlig, stablet dokumentflyt uten dra/
+endre størrelse — logikken for dette ligger i `public/windows.js`.
 
 ## Legge til et prosjekt
 

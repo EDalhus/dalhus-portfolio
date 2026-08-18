@@ -15,8 +15,23 @@
   </head>
   <body>
     <main class="desktop">
+      <div class="desktop-icons">
+        <button type="button" class="desktop-icon" data-icon-target="portfolio">
+          <span class="desktop-icon-glyph desktop-icon-glyph-folder" aria-hidden="true"></span>
+          <span class="desktop-icon-label" data-i18n="window.title">Portefølje</span>
+        </button>
+        <button type="button" class="desktop-icon" data-icon-target="gallery">
+          <span class="desktop-icon-glyph desktop-icon-glyph-photo" aria-hidden="true"></span>
+          <span class="desktop-icon-label">SmugMug</span>
+        </button>
+      </div>
+
       <!-- ================= Vindu 1: portefølje ================= -->
-      <section class="window" data-window="portfolio" role="region" aria-label="Portefølje">
+      <section class="window" data-window="portfolio" role="region" aria-label="Portefølje" hidden>
+        <span class="resize-handle resize-nw" data-resize="nw" aria-hidden="true"></span>
+        <span class="resize-handle resize-ne" data-resize="ne" aria-hidden="true"></span>
+        <span class="resize-handle resize-sw" data-resize="sw" aria-hidden="true"></span>
+        <span class="resize-handle resize-se" data-resize="se" aria-hidden="true"></span>
         <div class="title-bar">
           <span class="title-bar-icon" aria-hidden="true"></span>
           <h1 class="title-bar-text">Eirik Dalhus — <span data-i18n="window.title">Portefølje</span></h1>
@@ -68,7 +83,11 @@
       </section>
 
       <!-- ================= Vindu 2: SmugMug-galleri ================= -->
-      <section class="window" data-window="gallery" role="region" aria-label="Bilder">
+      <section class="window" data-window="gallery" role="region" aria-label="Bilder" hidden>
+        <span class="resize-handle resize-nw" data-resize="nw" aria-hidden="true"></span>
+        <span class="resize-handle resize-ne" data-resize="ne" aria-hidden="true"></span>
+        <span class="resize-handle resize-sw" data-resize="sw" aria-hidden="true"></span>
+        <span class="resize-handle resize-se" data-resize="se" aria-hidden="true"></span>
         <div class="title-bar">
           <span class="title-bar-icon title-bar-icon-photo" aria-hidden="true"></span>
           <h2 class="title-bar-text" data-i18n="gallery.title">Bilder — SmugMug</h2>
@@ -124,16 +143,39 @@
     </main>
 
     <footer class="taskbar">
-      <button type="button" class="btn start-button" id="start-button">
+      <button
+        type="button"
+        class="btn start-button"
+        id="start-button"
+        aria-haspopup="true"
+        aria-expanded="false"
+        aria-controls="start-menu"
+      >
         <span class="start-logo" aria-hidden="true"></span>
         <span>Start</span>
       </button>
+      <div class="start-menu" id="start-menu" role="menu" aria-label="Start" hidden>
+        <ul class="start-menu-list">
+          <li role="none">
+            <button type="button" class="start-menu-item" role="menuitem" data-window-target="portfolio">
+              <span class="task-icon" aria-hidden="true"></span>
+              <span>Eirik Dalhus</span>
+            </button>
+          </li>
+          <li role="none">
+            <button type="button" class="start-menu-item" role="menuitem" data-window-target="gallery">
+              <span class="task-icon task-icon-photo" aria-hidden="true"></span>
+              <span>SmugMug</span>
+            </button>
+          </li>
+        </ul>
+      </div>
       <div class="taskbar-divider" aria-hidden="true"></div>
-      <button type="button" class="btn task-button is-active" data-window-target="portfolio">
+      <button type="button" class="btn task-button" data-window-target="portfolio">
         <span class="task-icon" aria-hidden="true"></span>
         <span>Eirik Dalhus</span>
       </button>
-      <button type="button" class="btn task-button is-active" data-window-target="gallery">
+      <button type="button" class="btn task-button" data-window-target="gallery">
         <span class="task-icon task-icon-photo" aria-hidden="true"></span>
         <span>SmugMug</span>
       </button>

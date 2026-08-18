@@ -1,12 +1,15 @@
 /* ==========================================================================
-   app.js — skallet: språk, vinduer, oppgavelinje, klokke.
-   Innhold ligger i config.js, galleriet i gallery.js.
+   app.js — skallet: språk, klokke, klikkelyder.
+   Innhold ligger i config.js, galleriet i gallery.js, vinduene i windows.js.
    ========================================================================== */
 
 import { PROJECTS, STRINGS, LOCALES } from "./config.js";
 import * as gallery from "./gallery.js";
+import * as windows from "./windows.js";
 
 const STORAGE_KEY = "dalhus.lang";
+const SOUND_SELECTOR =
+  "button, .desktop-icon, .file-item, .tile:not(.is-demo), .album-row, .start-menu-item";
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
@@ -140,64 +143,70 @@ function updateClock() {
   });
 }
 
-/* --- Vindushåndtering ----------------------------------------------------- */
+/* --- Klikkelyder ------------------------------------------------------------
+   Syntetisert med Web Audio, ingen lydfil å laste ned — i tråd med resten
+   av siden som ikke drar inn eksterne avhengigheter. */
 
-function windowFor(name) {
-  return $(`.window[data-window="${name}"]`);
+let audioCtx = null;
+
+function ensureAudio() {
+  const Ctx = window.AudioContext || window.webkitAudioContext;
+  if (!Ctx) return null;
+  if (!audioCtx) audioCtx = new Ctx();
+  if (audioCtx.state === "suspended") audioCtx.resume();
+  return audioCtx;
 }
 
-function taskButtonFor(name) {
-  return $(`[data-window-target="${name}"]`);
+function playClick() {
+  const ctx = ensureAudio();
+  if (!ctx) return;
+
+  const now = ctx.currentTime;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  osc.type = "square";
+  osc.frequency.setValueAtTime(1400, now);
+  osc.frequency.exponentialRampToValueAtTime(700, now + 0.025);
+
+  gain.gain.setValueAtTime(0.05, now);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
+
+  osc.connect(gain).connect(ctx.destination);
+  osc.start(now);
+  osc.stop(now + 0.045);
 }
 
-function setWindowVisible(name, visible) {
-  const win = windowFor(name);
-  if (!win) return;
-  win.hidden = !visible;
-  taskButtonFor(name)?.classList.toggle("is-active", visible);
-}
-
-function initWindowControls() {
-  for (const win of $$(".window[data-window]")) {
-    const name = win.dataset.window;
-
-    win.querySelector('[data-action="minimize"]')?.addEventListener("click", () => {
-      setWindowVisible(name, false);
-    });
-
-    win.querySelector('[data-action="maximize"]')?.addEventListener("click", () => {
-      win.classList.toggle("is-maximized");
-    });
-
-    win.querySelector('[data-action="close"]')?.addEventListener("click", () => {
-      if (name === "portfolio") {
-        $("#shutdown-modal").hidden = false;
-        $("#dlg-ok").focus();
-      } else {
-        setWindowVisible(name, false);
-      }
-    });
-  }
-
-  for (const button of $$("[data-window-target]")) {
-    button.addEventListener("click", () => {
-      const name = button.dataset.windowTarget;
-      setWindowVisible(name, windowFor(name)?.hidden === true);
-    });
-  }
+function initSounds() {
+  document.addEventListener("pointerdown", (event) => {
+    if (event.target.closest(SOUND_SELECTOR)) playClick();
+  });
 }
 
 /* --- Oppstart ------------------------------------------------------------- */
 
 function init() {
   gallery.init();
+
+  windows.init({
+    windows: ["portfolio", "gallery"],
+    onOpen: (name) => {
+      if (name === "gallery") gallery.start();
+    },
+    onCloseIntercept: (name) => {
+      if (name !== "portfolio") return false;
+      $("#shutdown-modal").hidden = false;
+      $("#dlg-ok").focus();
+      return true;
+    },
+  });
+
   applyLanguage(readStoredLang());
+  initSounds();
 
   for (const button of $$(".btn-lang")) {
     button.addEventListener("click", () => applyLanguage(button.dataset.lang));
   }
-
-  initWindowControls();
 
   $("#dlg-ok")?.addEventListener("click", () => {
     $("#shutdown-modal").hidden = true;
@@ -208,31 +217,8 @@ function init() {
     if (event.key === "Escape" && modal && !modal.hidden) modal.hidden = true;
   });
 
-  $("#start-button")?.addEventListener("click", () => {
-    setWindowVisible("portfolio", true);
-    setWindowVisible("gallery", true);
-    windowFor("portfolio")?.scrollIntoView({ behavior: "smooth", block: "start" });
-  });
-
   updateClock();
   setInterval(updateClock, 15000);
-
-  // Galleriet lastes først når vinduet faktisk er i nærheten av skjermen.
-  const galleryWindow = windowFor("gallery");
-  if (galleryWindow && "IntersectionObserver" in window) {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((entry) => entry.isIntersecting)) {
-          observer.disconnect();
-          gallery.start();
-        }
-      },
-      { rootMargin: "200px" },
-    );
-    observer.observe(galleryWindow);
-  } else {
-    gallery.start();
-  }
 }
 
 if (document.readyState === "loading") {

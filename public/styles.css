@@ -69,6 +69,7 @@ body {
 /* --- Skrivebord ---------------------------------------------------------- */
 
 .desktop {
+  position: relative;
   min-height: 100%;
   padding: 24px 16px calc(var(--taskbar-height) + 32px);
   display: flex;
@@ -77,9 +78,96 @@ body {
   gap: 18px;
 }
 
+.desktop.is-desktop-mode {
+  align-items: flex-start;
+}
+
+/* --- Skrivebordsikoner ----------------------------------------------------- */
+
+.desktop-icons {
+  display: flex;
+  flex-direction: column;
+  align-self: flex-start;
+  gap: 14px;
+}
+
+.desktop-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 76px;
+  padding: 6px 4px;
+  background: none;
+  border: 1px dotted transparent;
+  color: var(--w95-white);
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.desktop-icon-glyph {
+  position: relative;
+  width: 32px;
+  height: 28px;
+}
+
+.desktop-icon-glyph-folder::before {
+  content: "";
+  position: absolute;
+  left: 1px;
+  top: 3px;
+  width: 13px;
+  height: 4px;
+  background: #d9a520;
+  border: 1px solid #6b4e00;
+  border-bottom: none;
+  border-radius: 1px 3px 0 0;
+}
+
+.desktop-icon-glyph-folder::after {
+  content: "";
+  position: absolute;
+  left: 1px;
+  top: 6px;
+  width: 28px;
+  height: 19px;
+  background: linear-gradient(180deg, #ffd964 0%, #e5aa1d 100%);
+  border: 1px solid #6b4e00;
+  border-radius: 0 2px 2px 2px;
+  box-shadow: inset 1px 1px 0 #fff2bd;
+}
+
+.desktop-icon-glyph-photo {
+  background:
+    linear-gradient(135deg, #1a7f37 0 40%, transparent 0) 0 0 / 100% 60% no-repeat,
+    linear-gradient(#7fc7ff, #ffffff);
+  border: 1px solid var(--w95-dark);
+}
+
+.desktop-icon-label {
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.25;
+  word-break: break-word;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.6);
+}
+
+.desktop-icon:hover .desktop-icon-label,
+.desktop-icon:focus-visible .desktop-icon-label,
+.desktop-icon.is-selected .desktop-icon-label {
+  outline: 1px dotted var(--w95-white);
+  background: var(--w95-select);
+  text-shadow: none;
+}
+
+.desktop-icon:focus-visible {
+  outline: none;
+}
+
 /* --- Vindu --------------------------------------------------------------- */
 
 .window {
+  position: relative;
   width: min(720px, 100%);
   background: var(--w95-face);
   padding: 3px;
@@ -98,6 +186,74 @@ body {
 .window.is-maximized {
   width: 100%;
   max-width: none;
+}
+
+.window.is-dragging,
+.window.is-resizing {
+  user-select: none;
+}
+
+.desktop.is-desktop-mode .window[data-window]:not([hidden]) {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.desktop.is-desktop-mode .window[data-window] .window-body {
+  flex: 1 1 auto;
+  overflow: auto;
+}
+
+.desktop.is-desktop-mode .window[data-window] .title-bar {
+  touch-action: none;
+  cursor: default;
+}
+
+/* Vinduer som ikke har fokus får grå tittellinje, som i ekte Windows 95 */
+.window[data-window]:not(.is-focused) .title-bar {
+  background: linear-gradient(90deg, var(--w95-shadow) 0%, #a9a9a9 100%);
+}
+
+/* --- Endre størrelse i hjørnene --------------------------------------------- */
+
+.resize-handle {
+  display: none;
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  z-index: 5;
+  touch-action: none;
+}
+
+.desktop.is-desktop-mode .window[data-window]:not(.is-maximized) .resize-handle {
+  display: block;
+}
+
+.resize-nw {
+  top: -4px;
+  left: -4px;
+  cursor: nwse-resize;
+}
+
+.resize-ne {
+  top: -4px;
+  right: -4px;
+  cursor: nesw-resize;
+}
+
+.resize-sw {
+  bottom: -4px;
+  left: -4px;
+  cursor: nesw-resize;
+}
+
+.resize-se {
+  bottom: -4px;
+  right: -4px;
+  cursor: nwse-resize;
 }
 
 .title-bar {
@@ -481,7 +637,7 @@ body {
   display: grid;
   place-items: center;
   background: rgba(0, 0, 0, 0.35);
-  z-index: 40;
+  z-index: 1000;
   padding: 16px;
 }
 
@@ -522,7 +678,7 @@ body {
   background: var(--w95-face);
   border-top: 1px solid var(--w95-white);
   box-shadow: inset 0 1px 0 var(--w95-light);
-  z-index: 30;
+  z-index: 500;
 }
 
 .start-button {
@@ -543,6 +699,57 @@ body {
     linear-gradient(#4cd964, #4cd964) 9px 0 / 7px 7px no-repeat,
     linear-gradient(#0a84ff, #0a84ff) 0 8px / 8px 7px no-repeat,
     linear-gradient(#ffcc00, #ffcc00) 9px 8px / 7px 7px no-repeat;
+}
+
+.start-menu {
+  position: absolute;
+  left: 3px;
+  bottom: calc(100% + 3px);
+  width: 200px;
+  background: var(--w95-face);
+  padding: 3px;
+  border: 1px solid;
+  border-color: var(--w95-white) var(--w95-dark) var(--w95-dark) var(--w95-white);
+  box-shadow:
+    inset 1px 1px 0 var(--w95-light),
+    inset -1px -1px 0 var(--w95-shadow),
+    4px 4px 0 rgba(0, 0, 0, 0.28);
+  z-index: 900;
+}
+
+.start-menu[hidden] {
+  display: none;
+}
+
+.start-menu-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 1px;
+}
+
+.start-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 10px;
+  background: none;
+  border: 1px dotted transparent;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--w95-text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.start-menu-item:hover,
+.start-menu-item:focus-visible {
+  outline: none;
+  background: var(--w95-select);
+  color: var(--w95-white);
+  border-color: var(--w95-select);
 }
 
 .taskbar-divider {
