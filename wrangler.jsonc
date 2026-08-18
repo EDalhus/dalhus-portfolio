@@ -11,7 +11,7 @@
   "vars": {
     // SmugMug-brukernavnet ditt — den delen som står i URL-en til siden din,
     // f.eks. "cmac" for cmac.smugmug.com. Bytt ut før deploy.
-    "SMUGMUG_NICKNAME": "DITT-BRUKERNAVN"
+    "SMUGMUG_NICKNAME": "eirikdalhus"
   },
   // SMUGMUG_API_KEY settes som secret, ikke her:
   //   npx wrangler secret put SMUGMUG_API_KEY
