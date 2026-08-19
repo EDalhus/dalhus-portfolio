@@ -230,7 +230,7 @@ function findAlbumImagesUri(response) {
   return { imagesUri: null, title: null, webUri: null };
 }
 
-async function fetchAlbumImages(uris, albumPath, apiKey, count, offset, warnings, apiRoot) {
+async function fetchAlbumImages(uris, albumPath, apiKey, count, offset, warnings, apiRoot, debug) {
   const lookupUri = uriValue(uris.UrlPathLookup);
   if (!lookupUri) {
     warnings.push("Fant ingen UrlPathLookup-URI på denne brukeren.");
@@ -242,7 +242,9 @@ async function fetchAlbumImages(uris, albumPath, apiKey, count, offset, warnings
 
   if (!imagesUri) {
     warnings.push(`Fant ikke bilder for album-stien ${albumPath}.`);
-    return { images: [], hasMore: false, album: null };
+    // Midlertidig: eksponer rådataene fra UrlPathLookup i debug-modus, siden
+    // vi ikke har kunnet verifisere responsformen mot den ekte APIen.
+    return { images: [], hasMore: false, album: null, rawLookup: debug ? data : undefined };
   }
 
   const page = await fetchImagePage(imagesUri, apiKey, count, offset, apiRoot);
@@ -313,7 +315,7 @@ export async function handleSmugmugRequest(request, env, ctx) {
     try {
       const { user, uris } = await fetchUserUris(nickname, apiKey, apiRoot);
       const fetchImages = albumPath
-        ? fetchAlbumImages(uris, albumPath, apiKey, imageCount, offset, warnings, apiRoot)
+        ? fetchAlbumImages(uris, albumPath, apiKey, imageCount, offset, warnings, apiRoot, debug)
         : fetchRecentImages(uris, apiKey, imageCount, offset, warnings, apiRoot);
       const result = await fetchImages.catch((error) => {
         warnings.push(`Bilder: ${error.message}`);
@@ -330,6 +332,7 @@ export async function handleSmugmugRequest(request, env, ctx) {
         ...(albumPath ? { album: result.album } : {}),
         warnings,
         ...(debug ? { availableUris: Object.keys(uris).sort() } : {}),
+        ...(debug && result.rawLookup ? { rawLookup: result.rawLookup } : {}),
       };
     } catch (error) {
       payload = {
