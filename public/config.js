@@ -50,6 +50,13 @@ export const GALLERY = {
   endpoint: "/api/smugmug",
 };
 
+/**
+ * Eget vindu for ett bestemt SmugMug-album (The Gathering 2026), i stedet
+ * for kontoens siste bilder. Stien er den samme som i den pene URL-en
+ * (https://eirikdalhus.smugmug.com/FA/KANDU/TG26H → "/FA/KANDU/TG26H").
+ */
+export const GATHERING_ALBUM_PATH = "/FA/KANDU/TG26H";
+
 /** Tetris-brettet og highscore-endepunktet. */
 export const TETRIS = {
   cols: 10,

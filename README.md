@@ -24,7 +24,7 @@ Ingen byggesteg, ingen rammeverk, ingen avhengigheter i nettleseren.
     ├── config.js         # Prosjekter, tekster, galleri-/Tetris-innstillinger
     ├── app.js            # Skall: språk, klokke, klikkelyder
     ├── windows.js        # Vindusbehandler: åpne/dra/endre størrelse, Start-meny
-    ├── gallery.js        # Tegner SmugMug-galleriet
+    ├── gallery.js        # createGallery() — driver både SmugMug- og The Gathering-vinduet
     ├── tetris.js         # Spillmotor + highscore-liste
     ├── minesweeper.js    # Klassisk Minesveiper, helt lokalt
     ├── pinball.js        # Enkelt flipperspill med 2D-fysikk
@@ -123,13 +123,33 @@ Anonym tilgang med API-nøkkel når bare **offentlige** bilder. Private eller
 skjulte album krever full OAuth 1.0a-signering med en access token — en god del
 mer arbeid, og det krever et sted å lagre token (f.eks. Workers KV).
 
+### Ett bestemt album (`?album=`)
+
+```
+GET /api/smugmug?images=100&offset=0&album=/FA/KANDU/TG26H
+```
+
+`album` er stien fra den pene SmugMug-URL-en, uten domenet (så
+`https://eirikdalhus.smugmug.com/FA/KANDU/TG26H` blir `/FA/KANDU/TG26H`).
+Worker-en slår den opp via kontoens `UrlPathLookup`-URI for å finne
+albumets `AlbumImages`-lenke, og henter/paginerer derfra på samme måte som
+`UserRecentImages`. Svaret får i tillegg et `album: { title, webUri }`-felt.
+
+**Testet kun i demo-modus herfra** — jeg har ikke en ekte `SMUGMUG_API_KEY`
+tilgjengelig i dette miljøet, så `UrlPathLookup`-oppslaget (`findAlbumImagesUri`
+i `src/smugmug.js`) er skrevet defensivt ut fra hvordan resten av SmugMug-APIet
+oppfører seg, men ikke verifisert mot et ekte svar. Fungerer ikke
+«The Gathering 2026»-vinduet når det er deployet: kall
+`/api/smugmug?album=/FA/KANDU/TG26H&debug=1` og se på `warnings`.
+
 ## Skrivebordet
 
 Over 520px bredde oppfører vinduene seg som ekte Windows 95-vinduer:
 
-- Skrivebordsikonene («Portfolio», «SmugMug», «Tetris», «Minesveiper»,
-  «3D Flipperspill») åpner vinduene — de er lukket til man klikker, bortsett
-  fra SmugMug-galleriet som åpnes automatisk med det samme siden lastes.
+- Skrivebordsikonene («Portfolio», «SmugMug», «The Gathering 2026», «Tetris»,
+  «Minesveiper», «3D Flipperspill») åpner vinduene — de er lukket til man
+  klikker, bortsett fra SmugMug-galleriet som åpnes automatisk med det samme
+  siden lastes.
 - Tittellinjen kan dras for å flytte vinduet.
 - Hjørnene kan dras for å endre størrelse (minimum ca. 280×220px).
 - Start-knappen åpner en Start-meny som henger fast over oppgavelinjen og

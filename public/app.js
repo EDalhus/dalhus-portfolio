@@ -3,8 +3,8 @@
    Innhold ligger i config.js, galleriet i gallery.js, vinduene i windows.js.
    ========================================================================== */
 
-import { PROJECTS, STRINGS, LOCALES } from "./config.js";
-import * as gallery from "./gallery.js";
+import { PROJECTS, STRINGS, LOCALES, GATHERING_ALBUM_PATH } from "./config.js";
+import { createGallery } from "./gallery.js";
 import * as tetris from "./tetris.js";
 import * as minesweeper from "./minesweeper.js";
 import * as pinball from "./pinball.js";
@@ -12,6 +12,13 @@ import * as windows from "./windows.js";
 
 const STORAGE_KEY = "dalhus.lang";
 const SOUND_SELECTOR = "button, .desktop-icon, .file-item, .start-menu-item";
+
+const gallery = createGallery({ bodyId: "gallery-body", statusId: "gallery-status" });
+const gathering = createGallery({
+  bodyId: "gathering-body",
+  statusId: "gathering-status",
+  extraParams: { album: GATHERING_ALBUM_PATH },
+});
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
@@ -130,6 +137,7 @@ function applyLanguage(lang) {
 
   renderProjects(lang);
   gallery.setLanguage(lang);
+  gathering.setLanguage(lang);
   tetris.setLanguage(lang);
   minesweeper.setLanguage(lang);
   pinball.setLanguage(lang);
@@ -192,14 +200,16 @@ function initSounds() {
 
 function init() {
   gallery.init();
+  gathering.init();
   tetris.init();
   minesweeper.init();
   pinball.init();
 
   windows.init({
-    windows: ["portfolio", "gallery", "tetris", "minesweeper", "pinball"],
+    windows: ["portfolio", "gallery", "gathering", "tetris", "minesweeper", "pinball"],
     onOpen: (name) => {
       if (name === "gallery") gallery.start();
+      if (name === "gathering") gathering.start();
       if (name === "tetris") tetris.start();
     },
     onCloseIntercept: (name) => {

@@ -16,6 +16,7 @@ const ICON_COLUMN_WIDTH = 92;
 const DEFAULTS = {
   portfolio: { width: 720, height: 520, x: 40, y: 28 },
   gallery: { width: 1400, height: 900, x: 90, y: 30 },
+  gathering: { width: 900, height: 700, x: 160, y: 60 },
   tetris: { width: 460, height: 560, x: 200, y: 60 },
   minesweeper: { width: 320, height: 420, x: 260, y: 100 },
   pinball: { width: 580, height: 720, x: 320, y: 20 },

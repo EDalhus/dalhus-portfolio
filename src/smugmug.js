@@ -153,28 +153,16 @@ async function fetchUserUris(nickname, apiKey, apiRoot) {
 }
 
 /**
- * Henter opp til `count` bilder, fra og med `offset` i den fulle listen
- * (0-indeksert — «hent de neste 50 etter de 100 jeg allerede har»). SmugMug
- * har ikke nødvendigvis et enkelt kall som gir så mange på én gang, så vi
- * paginerer i biter av PAGE_SIZE med `start`/`count` til vi har nok eller
- * går tom for bilder.
+ * Henter opp til `count` bilder fra en gitt URI, fra og med `offset` i den
+ * fulle listen (0-indeksert). SmugMug har ikke nødvendigvis et enkelt kall
+ * som gir så mange på én gang, så vi paginerer i biter av PAGE_SIZE med
+ * `start`/`count` til vi har nok eller går tom for bilder.
  *
  * Returnerer `hasMore: true` hvis vi fikk akkurat så mange som spurt om
  * (det kan da finnes flere), og `false` hvis SmugMug ga oss færre enn
- * bedt om (vi har nådd slutten av kontoens bilder).
+ * bedt om (vi har nådd slutten av listen).
  */
-async function fetchRecentImages(uris, apiKey, count, offset, warnings, apiRoot) {
-  const candidates = ["UserRecentImages", "UserImageSearch", "UserFeaturedAlbums"];
-  const key = candidates.find((name) => uriValue(uris[name]));
-  if (!key) {
-    warnings.push("Fant ingen URI for nye bilder på denne brukeren.");
-    return { images: [], hasMore: false };
-  }
-  if (key !== "UserRecentImages") {
-    warnings.push(`Brukte ${key} som fallback for nye bilder.`);
-  }
-
-  const baseUri = uriValue(uris[key]);
+async function fetchImagePage(baseUri, apiKey, count, offset, apiRoot) {
   const images = [];
   let start = offset + 1; // SmugMug er 1-indeksert
   let exhausted = false;
@@ -202,6 +190,63 @@ async function fetchRecentImages(uris, apiKey, count, offset, warnings, apiRoot)
   }
 
   return { images: images.slice(0, count), hasMore: !exhausted };
+}
+
+async function fetchRecentImages(uris, apiKey, count, offset, warnings, apiRoot) {
+  const candidates = ["UserRecentImages", "UserImageSearch", "UserFeaturedAlbums"];
+  const key = candidates.find((name) => uriValue(uris[name]));
+  if (!key) {
+    warnings.push("Fant ingen URI for nye bilder på denne brukeren.");
+    return { images: [], hasMore: false };
+  }
+  if (key !== "UserRecentImages") {
+    warnings.push(`Brukte ${key} som fallback for nye bilder.`);
+  }
+
+  return fetchImagePage(uriValue(uris[key]), apiKey, count, offset, apiRoot);
+}
+
+/**
+ * SmugMugs pene URL-er (f.eks. /FA/KANDU/TG26H) løses om til den faktiske
+ * ressursen via kontoens UrlPathLookup-URI. Svaret legger den treffende
+ * ressursen (album/mappe/…) under en nøkkel som matcher `Response.Locator`
+ * — vi prøver den, og noen rimelige fallbacks, siden vi ikke har kunnet
+ * teste dette mot den ekte APIen herfra.
+ */
+function findAlbumImagesUri(response) {
+  const locatorObject = response?.Locator && response[response.Locator];
+  const candidates = [locatorObject, response?.Album, response?.Node, response].filter(Boolean);
+
+  for (const candidate of candidates) {
+    const imagesUri = uriValue(candidate?.Uris?.AlbumImages);
+    if (imagesUri) {
+      return {
+        imagesUri,
+        title: candidate.Name || candidate.Title || null,
+        webUri: candidate.WebUri || null,
+      };
+    }
+  }
+  return { imagesUri: null, title: null, webUri: null };
+}
+
+async function fetchAlbumImages(uris, albumPath, apiKey, count, offset, warnings, apiRoot) {
+  const lookupUri = uriValue(uris.UrlPathLookup);
+  if (!lookupUri) {
+    warnings.push("Fant ingen UrlPathLookup-URI på denne brukeren.");
+    return { images: [], hasMore: false, album: null };
+  }
+
+  const data = await getJson(buildUrl(lookupUri, apiKey, { urlname: albumPath }, apiRoot));
+  const { imagesUri, title, webUri } = findAlbumImagesUri(data?.Response);
+
+  if (!imagesUri) {
+    warnings.push(`Fant ikke bilder for album-stien ${albumPath}.`);
+    return { images: [], hasMore: false, album: null };
+  }
+
+  const page = await fetchImagePage(imagesUri, apiKey, count, offset, apiRoot);
+  return { ...page, album: { title, webUri } };
 }
 
 /* -------------------------------------------------------------------------
@@ -232,13 +277,15 @@ export async function handleSmugmugRequest(request, env, ctx) {
   const url = new URL(request.url);
   const imageCount = clamp(url.searchParams.get("images"), 100, 1, 200);
   const offset = clamp(url.searchParams.get("offset"), 0, 0, 100_000);
+  const albumPath = url.searchParams.get("album") || null;
   const debug = url.searchParams.get("debug") === "1";
 
   const cache = caches.default;
-  const cacheKey = new Request(
-    `${url.origin}/api/smugmug?images=${imageCount}&offset=${offset}&debug=${debug ? 1 : 0}`,
-    { method: "GET" },
-  );
+  const cacheKeyParts = [`images=${imageCount}`, `offset=${offset}`, `debug=${debug ? 1 : 0}`];
+  if (albumPath) cacheKeyParts.push(`album=${encodeURIComponent(albumPath)}`);
+  const cacheKey = new Request(`${url.origin}/api/smugmug?${cacheKeyParts.join("&")}`, {
+    method: "GET",
+  });
 
   if (!debug) {
     const hit = await cache.match(cacheKey);
@@ -265,16 +312,12 @@ export async function handleSmugmugRequest(request, env, ctx) {
   } else {
     try {
       const { user, uris } = await fetchUserUris(nickname, apiKey, apiRoot);
-      const { images, hasMore } = await fetchRecentImages(
-        uris,
-        apiKey,
-        imageCount,
-        offset,
-        warnings,
-        apiRoot,
-      ).catch((error) => {
+      const fetchImages = albumPath
+        ? fetchAlbumImages(uris, albumPath, apiKey, imageCount, offset, warnings, apiRoot)
+        : fetchRecentImages(uris, apiKey, imageCount, offset, warnings, apiRoot);
+      const result = await fetchImages.catch((error) => {
         warnings.push(`Bilder: ${error.message}`);
-        return { images: [], hasMore: false };
+        return { images: [], hasMore: false, album: null };
       });
 
       payload = {
@@ -282,8 +325,9 @@ export async function handleSmugmugRequest(request, env, ctx) {
         nickname,
         profileUrl: user.WebUri || null,
         generatedAt: new Date().toISOString(),
-        images,
-        hasMore,
+        images: result.images,
+        hasMore: result.hasMore,
+        ...(albumPath ? { album: result.album } : {}),
         warnings,
         ...(debug ? { availableUris: Object.keys(uris).sort() } : {}),
       };
