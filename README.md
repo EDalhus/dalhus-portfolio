@@ -2,7 +2,8 @@
 
 Statisk porteføljeside i Windows 95-stil, servert fra Cloudflare Workers med
 [Static Assets](https://developers.cloudflare.com/workers/static-assets/), med
-et SmugMug-galleri som hentes server-side i Worker-en.
+et SmugMug-galleri og et Tetris-spill med offentlig highscore-liste som begge
+hentes/lagres server-side i Worker-en.
 
 Ingen byggesteg, ingen rammeverk, ingen avhengigheter i nettleseren.
 
@@ -10,18 +11,20 @@ Ingen byggesteg, ingen rammeverk, ingen avhengigheter i nettleseren.
 
 ```
 .
-├── wrangler.jsonc        # Worker-config: assets, vars, 404-håndtering
+├── wrangler.jsonc        # Worker-config: assets, vars, KV, 404-håndtering
 ├── .dev.vars.example     # Mal for lokale hemmeligheter
 ├── src/
-│   ├── index.js          # Ruting: /healthz, /api/smugmug, ellers assets
-│   └── smugmug.js        # SmugMug-henting, normalisering og caching
+│   ├── index.js          # Ruting: /healthz, /api/smugmug, /api/leaderboard, ellers assets
+│   ├── smugmug.js        # SmugMug-henting, normalisering og caching
+│   └── leaderboard.js    # Tetris-highscore i Workers KV
 └── public/               # Serveres statisk fra Cloudflares edge
     ├── index.html
     ├── styles.css        # Hele Win95-temaet
-    ├── config.js         # Prosjekter, tekster, gallerinnstillinger
+    ├── config.js         # Prosjekter, tekster, galleri-/Tetris-innstillinger
     ├── app.js            # Skall: språk, klokke, klikkelyder
-    ├── windows.js         # Vindusbehandler: åpne/dra/endre størrelse, Start-meny
+    ├── windows.js        # Vindusbehandler: åpne/dra/endre størrelse, Start-meny
     ├── gallery.js        # Tegner SmugMug-galleriet
+    ├── tetris.js          # Spillmotor + highscore-liste
     ├── _headers          # Sikkerhetsheadere for de statiske filene
     ├── 404.html
     └── favicon.svg
@@ -111,8 +114,8 @@ mer arbeid, og det krever et sted å lagre token (f.eks. Workers KV).
 
 Over 520px bredde oppfører vinduene seg som ekte Windows 95-vinduer:
 
-- Skrivebordsikonene («Portfolio», «SmugMug») åpner vinduene — de er lukket
-  til man klikker.
+- Skrivebordsikonene («Portfolio», «SmugMug», «Tetris») åpner vinduene — de
+  er lukket til man klikker.
 - Tittellinjen kan dras for å flytte vinduet.
 - Hjørnene kan dras for å endre størrelse (minimum ca. 280×220px).
 - Start-knappen åpner en Start-meny som henger fast over oppgavelinjen og
@@ -121,6 +124,40 @@ Over 520px bredde oppfører vinduene seg som ekte Windows 95-vinduer:
 
 Under 520px faller alt tilbake til vanlig, stablet dokumentflyt uten dra/
 endre størrelse — logikken for dette ligger i `public/windows.js`.
+
+## Tetris
+
+Et lite Tetris-spill i vinduet, med en offentlig highscore-liste som lagres
+i Workers KV.
+
+- Åpner du vinduet vises **Poengliste**-fanen først — topplisten er synlig
+  for alle besøkende med det samme, uten å måtte spille.
+- **Spill**-fanen ber om et navn (lagres i `localStorage`, forhåndsutfylt
+  neste gang) før man kan starte.
+- Styring: piltaster for å flytte/rotere, mellomrom for hard drop, `P` for
+  pause. På skjermer under 520px vises knapper for berøring i stedet.
+- Når spillet er over sendes poengsummen automatisk til
+  `/api/leaderboard`, og lista friskes opp.
+
+### Sett opp highscore-lagring (Workers KV)
+
+Highscore-endepunktet trenger en KV-namespace. Uten en ekte en kjører
+`npm run dev` fint (wrangler simulerer den lokalt), men `wrangler deploy`
+feiler.
+
+```bash
+npx wrangler kv namespace create LEADERBOARD
+```
+
+Lim inn `id`-en du får tilbake i `wrangler.jsonc` under `kv_namespaces`.
+
+### Viktig: dette er et åpent, ikke-autentisert endepunkt
+
+`/api/leaderboard` validerer at poengsummen er et rimelig tall og saniterer
+navnet, men det finnes ingen server-side verifisering av at scoren faktisk
+ble spilt — hvem som helst kan POSTe en falsk highscore direkte mot
+endepunktet. Helt greit for en portefølje-lekeplass, men ikke bygg videre på
+dette uten å tenke gjennom det hvis det noen gang blir mer enn det.
 
 ## Legge til et prosjekt
 

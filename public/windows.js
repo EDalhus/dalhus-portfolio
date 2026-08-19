@@ -15,6 +15,7 @@ const EDGE_MARGIN = 8;
 const DEFAULTS = {
   portfolio: { width: 720, height: 520, x: 40, y: 28 },
   gallery: { width: 640, height: 520, x: 120, y: 92 },
+  tetris: { width: 460, height: 560, x: 200, y: 60 },
 };
 
 const CORNER_DELTAS = {

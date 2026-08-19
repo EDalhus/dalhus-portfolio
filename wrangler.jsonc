@@ -15,6 +15,14 @@
   },
   // SMUGMUG_API_KEY settes som secret, ikke her:
   //   npx wrangler secret put SMUGMUG_API_KEY
+  "kv_namespaces": [
+    // Lagrer Tetris-highscoren. Opprett med:
+    //   npx wrangler kv namespace create LEADERBOARD
+    // og lim inn "id" du får tilbake her. Uten en ekte id kjører
+    // `wrangler dev` fint med en lokal simulert namespace, men
+    // `wrangler deploy` feiler.
+    { "binding": "LEADERBOARD", "id": "REPLACE-WITH-KV-NAMESPACE-ID" }
+  ],
   "observability": {
     "enabled": true
   }

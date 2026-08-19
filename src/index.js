@@ -9,6 +9,7 @@
  * /healthz.
  */
 import { handleSmugmugRequest } from "./smugmug.js";
+import { handleLeaderboardRequest } from "./leaderboard.js";
 
 export default {
   async fetch(request, env, ctx) {
@@ -28,6 +29,13 @@ export default {
         return new Response("Method Not Allowed", { status: 405, headers: { allow: "GET" } });
       }
       return handleSmugmugRequest(request, env, ctx);
+    }
+
+    if (url.pathname === "/api/leaderboard") {
+      if (request.method !== "GET" && request.method !== "POST") {
+        return new Response("Method Not Allowed", { status: 405, headers: { allow: "GET, POST" } });
+      }
+      return handleLeaderboardRequest(request, env);
     }
 
     // Alt annet: la asset-laget svare (inkludert 404-siden).

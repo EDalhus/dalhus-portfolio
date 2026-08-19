@@ -24,6 +24,10 @@
           <span class="desktop-icon-glyph desktop-icon-glyph-photo" aria-hidden="true"></span>
           <span class="desktop-icon-label">SmugMug</span>
         </button>
+        <button type="button" class="desktop-icon" data-icon-target="tetris">
+          <span class="desktop-icon-glyph desktop-icon-glyph-tetris" aria-hidden="true"></span>
+          <span class="desktop-icon-label">Tetris</span>
+        </button>
       </div>
 
       <!-- ================= Vindu 1: portefølje ================= -->
@@ -125,6 +129,72 @@
         </div>
       </section>
 
+      <!-- ================= Vindu 3: Tetris ================= -->
+      <section class="window" data-window="tetris" role="region" aria-label="Tetris" hidden>
+        <span class="resize-handle resize-nw" data-resize="nw" aria-hidden="true"></span>
+        <span class="resize-handle resize-ne" data-resize="ne" aria-hidden="true"></span>
+        <span class="resize-handle resize-sw" data-resize="sw" aria-hidden="true"></span>
+        <span class="resize-handle resize-se" data-resize="se" aria-hidden="true"></span>
+        <div class="title-bar">
+          <span class="title-bar-icon title-bar-icon-tetris" aria-hidden="true"></span>
+          <h2 class="title-bar-text" data-i18n="tetris.title">TETRIS for Windows</h2>
+          <div class="title-bar-controls">
+            <button type="button" class="tb-btn" data-action="minimize" aria-label="Minimer">
+              <span class="glyph glyph-min" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="tb-btn" data-action="maximize" aria-label="Maksimer">
+              <span class="glyph glyph-max" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="tb-btn" data-action="close" aria-label="Lukk">
+              <span class="glyph glyph-close" aria-hidden="true"></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="menu-bar">
+          <ul class="menu-items">
+            <li><span class="menu-item" data-menu="game"></span></li>
+            <li><span class="menu-item" data-menu="skill"></span></li>
+            <li><span class="menu-item" data-menu="options"></span></li>
+            <li><span class="menu-item" data-menu="help"></span></li>
+          </ul>
+        </div>
+
+        <div class="window-body">
+          <div class="tabs" role="tablist">
+            <button
+              type="button"
+              class="tab is-active"
+              data-tetris-tab="scores"
+              role="tab"
+              aria-selected="true"
+              data-i18n="tetris.tab.scores"
+            >
+              High Scores
+            </button>
+            <button
+              type="button"
+              class="tab"
+              data-tetris-tab="play"
+              role="tab"
+              aria-selected="false"
+              data-i18n="tetris.tab.play"
+            >
+              Play
+            </button>
+          </div>
+
+          <div class="tab-panel field-sunken" id="tetris-body">
+            <!-- Fylles av tetris.js -->
+          </div>
+        </div>
+
+        <div class="status-bar">
+          <span class="status-field" id="tetris-status"></span>
+          <span class="status-field" data-i18n="tetris.controls.hint">Piltaster: flytt/roter</span>
+        </div>
+      </section>
+
       <!-- "Slå av"-dialog -->
       <div class="modal-backdrop" id="shutdown-modal" hidden>
         <div class="window dialog" role="dialog" aria-modal="true" aria-labelledby="dlg-title">
@@ -168,6 +238,12 @@
               <span>SmugMug</span>
             </button>
           </li>
+          <li role="none">
+            <button type="button" class="start-menu-item" role="menuitem" data-window-target="tetris">
+              <span class="task-icon task-icon-tetris" aria-hidden="true"></span>
+              <span>Tetris</span>
+            </button>
+          </li>
         </ul>
       </div>
       <div class="taskbar-divider" aria-hidden="true"></div>
@@ -178,6 +254,10 @@
       <button type="button" class="btn task-button" data-window-target="gallery">
         <span class="task-icon task-icon-photo" aria-hidden="true"></span>
         <span>SmugMug</span>
+      </button>
+      <button type="button" class="btn task-button" data-window-target="tetris">
+        <span class="task-icon task-icon-tetris" aria-hidden="true"></span>
+        <span>Tetris</span>
       </button>
       <div class="tray">
         <span class="tray-clock" id="clock">--:--</span>

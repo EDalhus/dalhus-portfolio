@@ -181,9 +181,13 @@ function retryButton() {
   return wrap;
 }
 
+function galleryTabs() {
+  return document.querySelectorAll('.window[data-window="gallery"] [data-tab]');
+}
+
 function renderTabs() {
   const dict = STRINGS[lang];
-  for (const tab of document.querySelectorAll("[data-tab]")) {
+  for (const tab of galleryTabs()) {
     const key = tab.dataset.tab;
     tab.textContent = dict[`gallery.tab.${key}`];
     const isActive = key === activeTab;
@@ -218,7 +222,7 @@ export function setLanguage(next) {
 }
 
 export function init() {
-  for (const tab of document.querySelectorAll("[data-tab]")) {
+  for (const tab of galleryTabs()) {
     tab.addEventListener("click", () => {
       activeTab = tab.dataset.tab;
       renderTabs();

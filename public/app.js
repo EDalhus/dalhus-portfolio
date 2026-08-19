@@ -5,6 +5,7 @@
 
 import { PROJECTS, STRINGS, LOCALES } from "./config.js";
 import * as gallery from "./gallery.js";
+import * as tetris from "./tetris.js";
 import * as windows from "./windows.js";
 
 const STORAGE_KEY = "dalhus.lang";
@@ -128,6 +129,7 @@ function applyLanguage(lang) {
 
   renderProjects(lang);
   gallery.setLanguage(lang);
+  tetris.setLanguage(lang);
   updateClock();
   storeLang(lang);
 }
@@ -187,11 +189,13 @@ function initSounds() {
 
 function init() {
   gallery.init();
+  tetris.init();
 
   windows.init({
-    windows: ["portfolio", "gallery"],
+    windows: ["portfolio", "gallery", "tetris"],
     onOpen: (name) => {
       if (name === "gallery") gallery.start();
+      if (name === "tetris") tetris.start();
     },
     onCloseIntercept: (name) => {
       if (name !== "portfolio") return false;
