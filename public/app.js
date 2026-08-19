@@ -204,6 +204,9 @@ function init() {
     },
   });
 
+  // SmugMug-galleriet skal være synlig med det samme, uten å måtte klikke ikonet.
+  windows.open("gallery");
+
   applyLanguage(readStoredLang());
   initSounds();
 
