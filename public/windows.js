@@ -11,11 +11,14 @@ const DESKTOP_BREAKPOINT = "(min-width: 521px)";
 const MIN_WIDTH = 280;
 const MIN_HEIGHT = 220;
 const EDGE_MARGIN = 8;
+const ICON_COLUMN_WIDTH = 92;
 
 const DEFAULTS = {
   portfolio: { width: 720, height: 520, x: 40, y: 28 },
   gallery: { width: 1400, height: 900, x: 90, y: 30 },
   tetris: { width: 460, height: 560, x: 200, y: 60 },
+  minesweeper: { width: 320, height: 420, x: 260, y: 100 },
+  pinball: { width: 580, height: 720, x: 320, y: 20 },
 };
 
 const CORNER_DELTAS = {
@@ -62,7 +65,11 @@ function defaultRect(name) {
   const bounds = desktop.getBoundingClientRect();
   const width = Math.min(base.width, Math.max(MIN_WIDTH, bounds.width - EDGE_MARGIN * 2));
   const height = Math.min(base.height, Math.max(MIN_HEIGHT, window.innerHeight - 160));
-  const x = clamp(base.x, 0, Math.max(0, bounds.width - width));
+  // Ikke la et bredt standardvindu klemmes så langt til venstre at det
+  // dekker skrivebordsikonene helt.
+  const maxX = Math.max(0, bounds.width - width);
+  const minX = Math.min(ICON_COLUMN_WIDTH, maxX);
+  const x = clamp(base.x, minX, maxX);
   const y = Math.max(0, base.y);
   return { x, y, width, height };
 }

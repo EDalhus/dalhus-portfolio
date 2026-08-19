@@ -6,6 +6,8 @@
 import { PROJECTS, STRINGS, LOCALES } from "./config.js";
 import * as gallery from "./gallery.js";
 import * as tetris from "./tetris.js";
+import * as minesweeper from "./minesweeper.js";
+import * as pinball from "./pinball.js";
 import * as windows from "./windows.js";
 
 const STORAGE_KEY = "dalhus.lang";
@@ -129,6 +131,8 @@ function applyLanguage(lang) {
   renderProjects(lang);
   gallery.setLanguage(lang);
   tetris.setLanguage(lang);
+  minesweeper.setLanguage(lang);
+  pinball.setLanguage(lang);
   updateClock();
   storeLang(lang);
 }
@@ -189,9 +193,11 @@ function initSounds() {
 function init() {
   gallery.init();
   tetris.init();
+  minesweeper.init();
+  pinball.init();
 
   windows.init({
-    windows: ["portfolio", "gallery", "tetris"],
+    windows: ["portfolio", "gallery", "tetris", "minesweeper", "pinball"],
     onOpen: (name) => {
       if (name === "gallery") gallery.start();
       if (name === "tetris") tetris.start();

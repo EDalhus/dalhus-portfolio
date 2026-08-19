@@ -2,8 +2,9 @@
 
 Statisk porteføljeside i Windows 95-stil, servert fra Cloudflare Workers med
 [Static Assets](https://developers.cloudflare.com/workers/static-assets/), med
-et SmugMug-galleri og et Tetris-spill med offentlig highscore-liste som begge
-hentes/lagres server-side i Worker-en.
+et SmugMug-galleri, et Tetris-spill med offentlig highscore-liste (server-side
+i Worker-en), og Minesveiper + et enkelt flipperspill som begge kjører helt
+lokalt i nettleseren.
 
 Ingen byggesteg, ingen rammeverk, ingen avhengigheter i nettleseren.
 
@@ -24,7 +25,9 @@ Ingen byggesteg, ingen rammeverk, ingen avhengigheter i nettleseren.
     ├── app.js            # Skall: språk, klokke, klikkelyder
     ├── windows.js        # Vindusbehandler: åpne/dra/endre størrelse, Start-meny
     ├── gallery.js        # Tegner SmugMug-galleriet
-    ├── tetris.js          # Spillmotor + highscore-liste
+    ├── tetris.js         # Spillmotor + highscore-liste
+    ├── minesweeper.js    # Klassisk Minesveiper, helt lokalt
+    ├── pinball.js        # Enkelt flipperspill med 2D-fysikk
     ├── _headers          # Sikkerhetsheadere for de statiske filene
     ├── 404.html
     └── favicon.svg
@@ -118,8 +121,9 @@ mer arbeid, og det krever et sted å lagre token (f.eks. Workers KV).
 
 Over 520px bredde oppfører vinduene seg som ekte Windows 95-vinduer:
 
-- Skrivebordsikonene («Portfolio», «SmugMug», «Tetris») åpner vinduene — de
-  er lukket til man klikker.
+- Skrivebordsikonene («Portfolio», «SmugMug», «Tetris», «Minesveiper»,
+  «3D Flipperspill») åpner vinduene — de er lukket til man klikker, bortsett
+  fra SmugMug-galleriet som åpnes automatisk med det samme siden lastes.
 - Tittellinjen kan dras for å flytte vinduet.
 - Hjørnene kan dras for å endre størrelse (minimum ca. 280×220px).
 - Start-knappen åpner en Start-meny som henger fast over oppgavelinjen og
@@ -162,6 +166,29 @@ navnet, men det finnes ingen server-side verifisering av at scoren faktisk
 ble spilt — hvem som helst kan POSTe en falsk highscore direkte mot
 endepunktet. Helt greit for en portefølje-lekeplass, men ikke bygg videre på
 dette uten å tenke gjennom det hvis det noen gang blir mer enn det.
+
+## Minesveiper
+
+Klassisk Minesveiper (`public/minesweeper.js`), helt lokalt — ingen
+server-data, ingen highscore. Nybegynner/Middels/Ekspert bytter brettstørrelse,
+venstreklikk avdekker (og "chorder" et avdekket tall hvis nok flagg står
+rundt det), høyreklikk flagger. "Flagg-modus"-knappen bytter venstreklikk
+til å flagge i stedet, for mobil uten høyreklikk.
+
+## Flipperspill
+
+Et enkelt flipperspill (`public/pinball.js`) med ekte 2D-fysikk — tyngdekraft,
+veggkollisjon, bumpere som gir et "kick", og flippere som gir ballen fart
+basert på hvor fort de svinger når de treffer den (ikke bare et fast reflekt).
+Dette er en **v1 med et originaltegnet baneoppsett** — ingen grafikk fra det
+klassiske "3D Pinball for Windows – Space Cadet" er brukt. Styring: piltaster
+for flipperne, mellomrom for å lade og skyte ut ballen, `P` for pause.
+
+Banens vegger er definert som en liste linjesegmenter i `WALLS`
+(`public/pinball.js`) — brettet er tegnet for hånd som koordinater, ikke
+importert fra noe sted. Vil du justere formen, er det her du gjør det; pass på
+at hvert segment faktisk møter det neste (et gap, selv på under en pikselbredde
+mellom to vegger, lar ballen falle rett gjennom).
 
 ## Legge til et prosjekt
 

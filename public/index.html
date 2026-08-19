@@ -28,6 +28,14 @@
           <span class="desktop-icon-glyph desktop-icon-glyph-tetris" aria-hidden="true"></span>
           <span class="desktop-icon-label">Tetris</span>
         </button>
+        <button type="button" class="desktop-icon" data-icon-target="minesweeper">
+          <span class="desktop-icon-glyph desktop-icon-glyph-mine" aria-hidden="true"></span>
+          <span class="desktop-icon-label" data-i18n="minesweeper.title">Minesveiper</span>
+        </button>
+        <button type="button" class="desktop-icon" data-icon-target="pinball">
+          <span class="desktop-icon-glyph desktop-icon-glyph-pinball" aria-hidden="true"></span>
+          <span class="desktop-icon-label" data-i18n="pinball.title">3D Flipperspill</span>
+        </button>
       </div>
 
       <!-- ================= Vindu 1: portefølje ================= -->
@@ -186,6 +194,81 @@
         </div>
       </section>
 
+      <!-- ================= Vindu 4: Minesveiper ================= -->
+      <section class="window" data-window="minesweeper" role="region" aria-label="Minesveiper" hidden>
+        <span class="resize-handle resize-nw" data-resize="nw" aria-hidden="true"></span>
+        <span class="resize-handle resize-ne" data-resize="ne" aria-hidden="true"></span>
+        <span class="resize-handle resize-sw" data-resize="sw" aria-hidden="true"></span>
+        <span class="resize-handle resize-se" data-resize="se" aria-hidden="true"></span>
+        <div class="title-bar">
+          <span class="title-bar-icon title-bar-icon-mine" aria-hidden="true"></span>
+          <h2 class="title-bar-text" data-i18n="minesweeper.title">Minesveiper</h2>
+          <div class="title-bar-controls">
+            <button type="button" class="tb-btn" data-action="minimize" aria-label="Minimer">
+              <span class="glyph glyph-min" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="tb-btn" data-action="maximize" aria-label="Maksimer">
+              <span class="glyph glyph-max" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="tb-btn" data-action="close" aria-label="Lukk">
+              <span class="glyph glyph-close" aria-hidden="true"></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="menu-bar">
+          <ul class="menu-items">
+            <li><span class="menu-item" data-menu="game"></span></li>
+            <li><span class="menu-item" data-menu="help"></span></li>
+          </ul>
+        </div>
+
+        <div class="window-body">
+          <div class="field-sunken" id="minesweeper-body">
+            <!-- Fylles av minesweeper.js -->
+          </div>
+        </div>
+
+        <div class="status-bar">
+          <span class="status-field" id="minesweeper-status"></span>
+          <span class="status-field" data-i18n="minesweeper.hint">Klikk for å avdekke</span>
+        </div>
+      </section>
+
+      <!-- ================= Vindu 5: Flipperspill ================= -->
+      <section class="window" data-window="pinball" role="region" aria-label="Flipperspill" hidden>
+        <span class="resize-handle resize-nw" data-resize="nw" aria-hidden="true"></span>
+        <span class="resize-handle resize-ne" data-resize="ne" aria-hidden="true"></span>
+        <span class="resize-handle resize-sw" data-resize="sw" aria-hidden="true"></span>
+        <span class="resize-handle resize-se" data-resize="se" aria-hidden="true"></span>
+        <div class="title-bar">
+          <span class="title-bar-icon title-bar-icon-pinball" aria-hidden="true"></span>
+          <h2 class="title-bar-text" data-i18n="pinball.title">3D Flipperspill</h2>
+          <div class="title-bar-controls">
+            <button type="button" class="tb-btn" data-action="minimize" aria-label="Minimer">
+              <span class="glyph glyph-min" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="tb-btn" data-action="maximize" aria-label="Maksimer">
+              <span class="glyph glyph-max" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="tb-btn" data-action="close" aria-label="Lukk">
+              <span class="glyph glyph-close" aria-hidden="true"></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="window-body">
+          <div class="field-sunken" id="pinball-body">
+            <!-- Fylles av pinball.js -->
+          </div>
+        </div>
+
+        <div class="status-bar">
+          <span class="status-field" id="pinball-status"></span>
+          <span class="status-field" data-i18n="pinball.controls.hint">◀ ▶: flippere</span>
+        </div>
+      </section>
+
       <!-- "Slå av"-dialog -->
       <div class="modal-backdrop" id="shutdown-modal" hidden>
         <div class="window dialog" role="dialog" aria-modal="true" aria-labelledby="dlg-title">
@@ -235,6 +318,18 @@
               <span>Tetris</span>
             </button>
           </li>
+          <li role="none">
+            <button type="button" class="start-menu-item" role="menuitem" data-window-target="minesweeper">
+              <span class="task-icon task-icon-mine" aria-hidden="true"></span>
+              <span data-i18n="minesweeper.title">Minesveiper</span>
+            </button>
+          </li>
+          <li role="none">
+            <button type="button" class="start-menu-item" role="menuitem" data-window-target="pinball">
+              <span class="task-icon task-icon-pinball" aria-hidden="true"></span>
+              <span data-i18n="pinball.title">3D Flipperspill</span>
+            </button>
+          </li>
         </ul>
       </div>
       <div class="taskbar-divider" aria-hidden="true"></div>
@@ -249,6 +344,14 @@
       <button type="button" class="btn task-button" data-window-target="tetris">
         <span class="task-icon task-icon-tetris" aria-hidden="true"></span>
         <span>Tetris</span>
+      </button>
+      <button type="button" class="btn task-button" data-window-target="minesweeper">
+        <span class="task-icon task-icon-mine" aria-hidden="true"></span>
+        <span data-i18n="minesweeper.title">Minesveiper</span>
+      </button>
+      <button type="button" class="btn task-button" data-window-target="pinball">
+        <span class="task-icon task-icon-pinball" aria-hidden="true"></span>
+        <span data-i18n="pinball.title">3D Flipperspill</span>
       </button>
       <div class="tray">
         <span class="tray-clock" id="clock">--:--</span>

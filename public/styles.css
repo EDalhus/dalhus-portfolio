@@ -1353,3 +1353,258 @@ body {
     display: flex;
   }
 }
+
+/* ==========================================================================
+   Minesveiper — vindu 4
+   ========================================================================== */
+
+.desktop-icon-glyph-mine,
+.title-bar-icon-mine,
+.task-icon-mine {
+  background:
+    radial-gradient(circle at 35% 35%, #4a4a4a 0 35%, #1a1a1a 40% 100%) center / 80% 80% no-repeat,
+    var(--w95-face);
+  border: 1px solid var(--w95-dark);
+}
+
+#minesweeper-body {
+  overflow-x: auto;
+  padding: 10px;
+}
+
+.mine-difficulty {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.mine-difficulty-btn.is-active {
+  border-color: var(--w95-dark) var(--w95-white) var(--w95-white) var(--w95-dark);
+  box-shadow:
+    inset 1px 1px 0 var(--w95-shadow),
+    inset -1px -1px 0 var(--w95-light);
+}
+
+.mine-flag-mode {
+  margin-left: auto;
+}
+
+.mine-flag-mode.is-active {
+  border-color: var(--w95-dark) var(--w95-white) var(--w95-white) var(--w95-dark);
+  box-shadow:
+    inset 1px 1px 0 var(--w95-shadow),
+    inset -1px -1px 0 var(--w95-light);
+  background-color: #9c9c9c;
+}
+
+.mine-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px;
+  margin-bottom: 8px;
+  width: fit-content;
+}
+
+.mine-lcd {
+  min-width: 52px;
+  padding: 2px 4px;
+  background: #000000;
+  color: #ff3b30;
+  font-family: "Courier New", monospace;
+  font-weight: 700;
+  font-size: 20px;
+  text-align: center;
+  letter-spacing: 2px;
+  border: 1px solid;
+  border-color: var(--w95-shadow) var(--w95-white) var(--w95-white) var(--w95-shadow);
+}
+
+.mine-smiley {
+  width: 36px;
+  height: 36px;
+  font-size: 20px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  background: var(--w95-face);
+  border: 1px solid;
+  border-color: var(--w95-white) var(--w95-dark) var(--w95-dark) var(--w95-white);
+  box-shadow:
+    inset 1px 1px 0 var(--w95-light),
+    inset -1px -1px 0 var(--w95-shadow);
+  cursor: pointer;
+}
+
+.mine-smiley:active {
+  border-color: var(--w95-dark) var(--w95-white) var(--w95-white) var(--w95-dark);
+  box-shadow:
+    inset 1px 1px 0 var(--w95-shadow),
+    inset -1px -1px 0 var(--w95-light);
+}
+
+.mine-board {
+  display: grid;
+  gap: 0;
+  width: fit-content;
+  background: var(--w95-shadow);
+  border: 2px solid;
+  border-color: var(--w95-shadow) var(--w95-white) var(--w95-white) var(--w95-shadow);
+}
+
+.mine-cell {
+  padding: 0;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  background: var(--w95-face);
+  border: 1px solid;
+  border-color: var(--w95-white) var(--w95-dark) var(--w95-dark) var(--w95-white);
+  box-shadow:
+    inset 1px 1px 0 var(--w95-light),
+    inset -1px -1px 0 var(--w95-shadow);
+  cursor: pointer;
+  user-select: none;
+}
+
+.mine-cell.is-revealed {
+  background: #d4d0c8;
+  border: 1px solid var(--w95-shadow);
+  box-shadow: none;
+  cursor: default;
+}
+
+.mine-cell.is-exploded {
+  background: #ff3b30;
+}
+
+.mine-cell.is-wrong-flag {
+  position: relative;
+}
+
+.mine-cell.is-wrong-flag::after {
+  content: "";
+  position: absolute;
+  inset: 15%;
+  background:
+    linear-gradient(45deg, transparent 45%, #a80000 45% 55%, transparent 55%),
+    linear-gradient(-45deg, transparent 45%, #a80000 45% 55%, transparent 55%);
+}
+
+/* ==========================================================================
+   Flipperspill — vindu 5
+   ========================================================================== */
+
+.desktop-icon-glyph-pinball,
+.title-bar-icon-pinball,
+.task-icon-pinball {
+  background:
+    radial-gradient(circle at 50% 45%, #e8e8f0 0 22%, transparent 25%) center / 90% 90% no-repeat,
+    linear-gradient(160deg, #3f5fd6 0%, #1a1a3a 100%);
+  border: 1px solid var(--w95-dark);
+}
+
+#pinball-body {
+  padding: 0;
+}
+
+.pinball-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px;
+}
+
+.pinball-side {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100px;
+  flex: none;
+}
+
+.pinball-stat {
+  padding: 5px 8px;
+}
+
+.pinball-stat-label {
+  margin: 0;
+  font-size: 11px;
+  color: var(--w95-shadow);
+}
+
+.pinball-stat-value {
+  margin: 2px 0 0;
+  font-size: 18px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.pinball-board-wrap {
+  position: relative;
+  flex: none;
+}
+
+.pinball-board {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  background: #0a0a18;
+  border: 2px solid;
+  border-color: var(--w95-shadow) var(--w95-white) var(--w95-white) var(--w95-shadow);
+  box-shadow:
+    inset 1px 1px 0 var(--w95-dark),
+    inset -1px -1px 0 var(--w95-light);
+}
+
+.pinball-overlay {
+  display: none;
+  position: absolute;
+  inset: 2px;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 12px;
+}
+
+.pinball-overlay.is-visible {
+  display: flex;
+}
+
+.pinball-overlay-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 240px;
+  padding: 14px 12px;
+  background: var(--w95-face);
+  border: 1px solid;
+  border-color: var(--w95-white) var(--w95-dark) var(--w95-dark) var(--w95-white);
+  box-shadow:
+    inset 1px 1px 0 var(--w95-light),
+    inset -1px -1px 0 var(--w95-shadow);
+  text-align: center;
+}
+
+.pinball-overlay-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.pinball-overlay-score {
+  margin: 0;
+  font-size: 12px;
+}
+
+.pinball-controls-hint {
+  margin: 4px 0 0;
+  font-size: 11px;
+  color: var(--w95-shadow);
+}

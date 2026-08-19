@@ -57,6 +57,25 @@ export const TETRIS = {
   endpoint: "/api/leaderboard",
 };
 
+/** Minesveiper-vanskelighetsgrader. */
+export const MINESWEEPER = {
+  presets: {
+    beginner: { cols: 9, rows: 9, mines: 10 },
+    intermediate: { cols: 16, rows: 16, mines: 40 },
+    expert: { cols: 30, rows: 16, mines: 99 },
+  },
+  defaultPreset: "beginner",
+  cell: 24,
+};
+
+/** Flipperbordets mål (i canvas-piksler). */
+export const PINBALL = {
+  width: 400,
+  height: 640,
+  ballRadius: 8,
+  startBalls: 3,
+};
+
 /** Tekster i to språk. Nøklene matcher data-i18n i index.html. */
 export const STRINGS = {
   no: {
@@ -117,6 +136,26 @@ export const STRINGS = {
     "tetris.highScores.score": "Poeng",
     "tetris.highScores.level": "Nivå",
     "tetris.submitError": "Kunne ikke lagre poengsummen din, men den vises her lokalt.",
+
+    "minesweeper.title": "Minesveiper",
+    "minesweeper.difficulty.beginner": "Nybegynner",
+    "minesweeper.difficulty.intermediate": "Middels",
+    "minesweeper.difficulty.expert": "Ekspert",
+    "minesweeper.newGame": "Nytt spill",
+    "minesweeper.hint": "Klikk for å avdekke · Høyreklikk for å flagge",
+    "minesweeper.flagMode": "Flagg-modus",
+
+    "pinball.title": "3D Flipperspill",
+    "pinball.score": "Poeng",
+    "pinball.balls": "Baller",
+    "pinball.start": "Start",
+    "pinball.playAgain": "Spill igjen",
+    "pinball.paused": "Pause",
+    "pinball.resume": "Fortsett",
+    "pinball.gameOver": "Game Over",
+    "pinball.yourScore": "Din poengsum",
+    "pinball.controls.hint": "◀ ▶: flippere · Mellomrom: skyt ut ballen · P: pause",
+    "pinball.launch": "Hold Mellomrom for å skyte ut",
   },
   en: {
     docTitle: "Eirik Dalhus — Portfolio",
@@ -176,6 +215,26 @@ export const STRINGS = {
     "tetris.highScores.score": "Score",
     "tetris.highScores.level": "Level",
     "tetris.submitError": "Couldn't save your score, but it's shown here locally.",
+
+    "minesweeper.title": "Minesweeper",
+    "minesweeper.difficulty.beginner": "Beginner",
+    "minesweeper.difficulty.intermediate": "Intermediate",
+    "minesweeper.difficulty.expert": "Expert",
+    "minesweeper.newGame": "New game",
+    "minesweeper.hint": "Click to reveal · Right-click to flag",
+    "minesweeper.flagMode": "Flag mode",
+
+    "pinball.title": "3D Pinball",
+    "pinball.score": "Score",
+    "pinball.balls": "Balls",
+    "pinball.start": "Start",
+    "pinball.playAgain": "Play again",
+    "pinball.paused": "Paused",
+    "pinball.resume": "Resume",
+    "pinball.gameOver": "Game Over",
+    "pinball.yourScore": "Your score",
+    "pinball.controls.hint": "◀ ▶: flippers · Space: launch ball · P: pause",
+    "pinball.launch": "Hold Space to launch",
   },
 };
 
