@@ -43,10 +43,9 @@ export const PROJECTS = [
   },
 ];
 
-/** Hvor mange bilder og album galleriet ber om. */
+/** Hvor mange bilder galleriet ber om. */
 export const GALLERY = {
-  images: 12,
-  albums: 6,
+  images: 150,
   endpoint: "/api/smugmug",
 };
 
@@ -78,8 +77,6 @@ export const STRINGS = {
     "dialog.ok": "OK",
 
     "gallery.title": "Bilder — SmugMug",
-    "gallery.tab.photos": "Siste bilder",
-    "gallery.tab.albums": "Siste album",
     "gallery.loading": "Henter fra SmugMug …",
     "gallery.retry": "Prøv igjen",
     "gallery.empty": "Ingenting å vise ennå.",
@@ -87,10 +84,10 @@ export const STRINGS = {
     "gallery.errorTitle": "Kunne ikke hente data",
     "gallery.openOriginal": "Åpne på SmugMug",
     "gallery.close": "Lukk",
+    "gallery.prev": "Forrige",
+    "gallery.next": "Neste",
     "gallery.untitled": "Uten tittel",
     photos: (n) => `${n} bilde${n === 1 ? "" : "r"}`,
-    albums: (n) => `${n} album`,
-    imagesIn: (n) => `${n} bilde${n === 1 ? "" : "r"}`,
     objects: (n) => `${n} objekt${n === 1 ? "" : "er"}`,
 
     "tetris.title": "TETRIS for Windows",
@@ -139,8 +136,6 @@ export const STRINGS = {
     "dialog.ok": "OK",
 
     "gallery.title": "Photos — SmugMug",
-    "gallery.tab.photos": "Latest photos",
-    "gallery.tab.albums": "Latest albums",
     "gallery.loading": "Fetching from SmugMug …",
     "gallery.retry": "Try again",
     "gallery.empty": "Nothing to show yet.",
@@ -148,10 +143,10 @@ export const STRINGS = {
     "gallery.errorTitle": "Could not fetch data",
     "gallery.openOriginal": "Open on SmugMug",
     "gallery.close": "Close",
+    "gallery.prev": "Previous",
+    "gallery.next": "Next",
     "gallery.untitled": "Untitled",
     photos: (n) => `${n} photo${n === 1 ? "" : "s"}`,
-    albums: (n) => `${n} album${n === 1 ? "" : "s"}`,
-    imagesIn: (n) => `${n} image${n === 1 ? "" : "s"}`,
     objects: (n) => `${n} object${n === 1 ? "" : "s"}`,
 
     "tetris.title": "TETRIS for Windows",

@@ -9,8 +9,7 @@ import * as tetris from "./tetris.js";
 import * as windows from "./windows.js";
 
 const STORAGE_KEY = "dalhus.lang";
-const SOUND_SELECTOR =
-  "button, .desktop-icon, .file-item, .tile:not(.is-demo), .album-row, .start-menu-item";
+const SOUND_SELECTOR = "button, .desktop-icon, .file-item, .start-menu-item";
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));

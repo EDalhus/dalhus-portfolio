@@ -1,14 +1,23 @@
 /* ==========================================================================
    gallery.js — henter /api/smugmug og tegner Win95-galleriet.
    Worker-en har allerede trimmet og cachet dataene, så her er det bare DOM.
+   Klikk på et bilde åpner en lokal, Win95-stil forhåndsvisning i stedet for
+   å hoppe til SmugMug direkte.
    ========================================================================== */
 
 import { GALLERY, STRINGS, LOCALES } from "./config.js";
 
 let data = null;
 let loadPromise = null;
-let activeTab = "photos";
 let lang = "no";
+
+let previewBackdrop;
+let previewTitleEl;
+let previewImageEl;
+let previewCounterEl;
+let previewMetaEl;
+let previewOpenLinkEl;
+let previewIndex = -1;
 
 const el = (tag, className, text) => {
   const node = document.createElement(tag);
@@ -31,7 +40,7 @@ function formatDate(iso) {
 /* --- Henting -------------------------------------------------------------- */
 
 async function load() {
-  const url = `${GALLERY.endpoint}?images=${GALLERY.images}&albums=${GALLERY.albums}`;
+  const url = `${GALLERY.endpoint}?images=${GALLERY.images}`;
   const res = await fetch(url, { headers: { accept: "application/json" } });
   const body = await res.json().catch(() => null);
   if (!body) throw new Error(`HTTP ${res.status}`);
@@ -54,15 +63,17 @@ function notice(kind, title, body) {
 
 /* --- Fliser --------------------------------------------------------------- */
 
-function photoTile(image) {
+function photoTile(image, index) {
   const dict = STRINGS[lang];
-  const tile = image.webUri ? el("a", "tile") : el("div", "tile");
-  if (image.webUri) {
-    tile.href = image.webUri;
-    tile.target = "_blank";
-    tile.rel = "noopener noreferrer";
+  const tile = el("button", "tile");
+  tile.type = "button";
+
+  if (image.demo) {
+    tile.classList.add("is-demo");
+    tile.disabled = true;
+  } else {
+    tile.addEventListener("click", () => openPreview(index));
   }
-  if (image.demo) tile.classList.add("is-demo");
 
   const frame = el("span", "tile-frame");
   if (image.thumb) {
@@ -82,42 +93,6 @@ function photoTile(image) {
   tile.append(frame, caption);
   if (meta) tile.append(el("span", "tile-meta", meta));
   return tile;
-}
-
-function albumRow(album) {
-  const dict = STRINGS[lang];
-  const row = album.webUri ? el("a", "album-row") : el("div", "album-row");
-  if (album.webUri) {
-    row.href = album.webUri;
-    row.target = "_blank";
-    row.rel = "noopener noreferrer";
-  }
-  if (album.demo) row.classList.add("is-demo");
-
-  const cover = el("span", "album-cover");
-  if (album.cover) {
-    const img = el("img", "album-cover-img");
-    img.src = album.cover;
-    img.alt = "";
-    img.loading = "lazy";
-    img.decoding = "async";
-    cover.append(img);
-  } else {
-    cover.append(el("span", "tile-placeholder"));
-  }
-
-  const text = el("span", "album-text");
-  text.append(el("span", "album-name", album.title || dict["gallery.untitled"]));
-
-  const bits = [];
-  if (album.imageCount) bits.push(dict.imagesIn(album.imageCount));
-  const date = formatDate(album.date);
-  if (date) bits.push(date);
-  if (bits.length) text.append(el("span", "album-meta", bits.join(" · ")));
-  if (album.description) text.append(el("p", "album-desc", album.description));
-
-  row.append(cover, text);
-  return row;
 }
 
 /* --- Rendering ------------------------------------------------------------ */
@@ -147,24 +122,17 @@ function renderBody() {
     body.append(notice("info", dict["gallery.demoTitle"], data.reason || ""));
   }
 
-  const items = activeTab === "photos" ? data.images || [] : data.albums || [];
+  const images = data.images || [];
 
-  if (!items.length) {
+  if (!images.length) {
     body.append(el("p", "gallery-message", dict["gallery.empty"]));
-  } else if (activeTab === "photos") {
-    const grid = el("div", "tile-grid");
-    for (const image of items) grid.append(photoTile(image));
-    body.append(grid);
   } else {
-    const list = el("div", "album-list");
-    for (const album of items) list.append(albumRow(album));
-    body.append(list);
+    const grid = el("div", "tile-grid");
+    images.forEach((image, index) => grid.append(photoTile(image, index)));
+    body.append(grid);
   }
 
-  if (status) {
-    status.textContent =
-      activeTab === "photos" ? dict.photos(items.length) : dict.albums(items.length);
-  }
+  if (status) status.textContent = dict.photos(images.length);
 }
 
 function retryButton() {
@@ -181,19 +149,126 @@ function retryButton() {
   return wrap;
 }
 
-function galleryTabs() {
-  return document.querySelectorAll('.window[data-window="gallery"] [data-tab]');
+/* --- Forhåndsvisning -------------------------------------------------------- */
+
+function buildPreviewModal() {
+  const backdrop = el("div", "modal-backdrop preview-backdrop");
+  backdrop.hidden = true;
+  backdrop.addEventListener("click", (event) => {
+    if (event.target === backdrop) closePreview();
+  });
+
+  const win = el("div", "window preview-window");
+  win.setAttribute("role", "dialog");
+  win.setAttribute("aria-modal", "true");
+
+  const titleBar = el("div", "title-bar");
+  const icon = el("span", "title-bar-icon title-bar-icon-photo");
+  icon.setAttribute("aria-hidden", "true");
+  previewTitleEl = el("h2", "title-bar-text");
+  const controls = el("div", "title-bar-controls");
+  const closeBtn = el("button", "tb-btn");
+  closeBtn.type = "button";
+  const closeGlyph = el("span", "glyph glyph-close");
+  closeGlyph.setAttribute("aria-hidden", "true");
+  closeBtn.append(closeGlyph);
+  closeBtn.addEventListener("click", closePreview);
+  controls.append(closeBtn);
+  titleBar.append(icon, previewTitleEl, controls);
+
+  const body = el("div", "window-body preview-body");
+  const prevBtn = el("button", "preview-nav preview-prev", "‹");
+  prevBtn.type = "button";
+  prevBtn.addEventListener("click", () => stepPreview(-1));
+  const nextBtn = el("button", "preview-nav preview-next", "›");
+  nextBtn.type = "button";
+  nextBtn.addEventListener("click", () => stepPreview(1));
+
+  previewImageEl = document.createElement("img");
+  previewImageEl.className = "preview-image";
+
+  body.append(prevBtn, previewImageEl, nextBtn);
+
+  const statusBar = el("div", "status-bar");
+  previewCounterEl = el("span", "status-field");
+  previewMetaEl = el("span", "status-field");
+  previewOpenLinkEl = document.createElement("a");
+  previewOpenLinkEl.className = "status-field preview-open-link";
+  previewOpenLinkEl.target = "_blank";
+  previewOpenLinkEl.rel = "noopener noreferrer";
+  statusBar.append(previewCounterEl, previewMetaEl, previewOpenLinkEl);
+
+  win.append(titleBar, body, statusBar);
+  backdrop.append(win);
+  document.body.append(backdrop);
+
+  previewBackdrop = backdrop;
+  applyPreviewChrome();
 }
 
-function renderTabs() {
+function applyPreviewChrome() {
   const dict = STRINGS[lang];
-  for (const tab of galleryTabs()) {
-    const key = tab.dataset.tab;
-    tab.textContent = dict[`gallery.tab.${key}`];
-    const isActive = key === activeTab;
-    tab.classList.toggle("is-active", isActive);
-    tab.setAttribute("aria-selected", String(isActive));
-    tab.tabIndex = isActive ? 0 : -1;
+  previewBackdrop?.querySelector(".tb-btn")?.setAttribute("aria-label", dict["gallery.close"]);
+  previewBackdrop?.querySelector(".preview-prev")?.setAttribute("aria-label", dict["gallery.prev"]);
+  previewBackdrop?.querySelector(".preview-next")?.setAttribute("aria-label", dict["gallery.next"]);
+  if (previewOpenLinkEl) previewOpenLinkEl.textContent = dict["gallery.openOriginal"];
+}
+
+function renderPreview() {
+  const dict = STRINGS[lang];
+  const images = data?.images || [];
+  const image = images[previewIndex];
+  if (!image) return;
+
+  previewTitleEl.textContent = image.title || dict["gallery.untitled"];
+  previewImageEl.src = image.display || image.thumb || "";
+  previewImageEl.alt = image.title || dict["gallery.untitled"];
+
+  previewMetaEl.textContent = formatDate(image.date);
+
+  if (image.webUri) {
+    previewOpenLinkEl.href = image.webUri;
+    previewOpenLinkEl.hidden = false;
+  } else {
+    previewOpenLinkEl.removeAttribute("href");
+    previewOpenLinkEl.hidden = true;
+  }
+  previewOpenLinkEl.textContent = dict["gallery.openOriginal"];
+
+  previewCounterEl.textContent = `${previewIndex + 1} / ${images.length}`;
+}
+
+function openPreview(index) {
+  if (!previewBackdrop) return;
+  previewIndex = index;
+  renderPreview();
+  previewBackdrop.hidden = false;
+}
+
+function closePreview() {
+  if (!previewBackdrop) return;
+  previewBackdrop.hidden = true;
+  previewIndex = -1;
+}
+
+function stepPreview(delta) {
+  const images = data?.images || [];
+  if (!images.length) return;
+  previewIndex = (previewIndex + delta + images.length) % images.length;
+  renderPreview();
+}
+
+function handlePreviewKeydown(event) {
+  if (!previewBackdrop || previewBackdrop.hidden) return;
+  if (event.key === "Escape") {
+    event.preventDefault();
+    closePreview();
+  } else if (event.key === "ArrowLeft") {
+    event.preventDefault();
+    stepPreview(-1);
+  } else if (event.key === "ArrowRight") {
+    event.preventDefault();
+    stepPreview(1);
   }
 }
 
@@ -209,7 +284,7 @@ export function start() {
       }
     })
     .catch((error) => {
-      data = { source: "error", reason: error.message, images: [], albums: [] };
+      data = { source: "error", reason: error.message, images: [] };
     })
     .finally(renderBody);
   return loadPromise;
@@ -217,18 +292,13 @@ export function start() {
 
 export function setLanguage(next) {
   lang = next;
-  renderTabs();
   renderBody();
+  applyPreviewChrome();
+  if (previewBackdrop && !previewBackdrop.hidden) renderPreview();
 }
 
 export function init() {
-  for (const tab of galleryTabs()) {
-    tab.addEventListener("click", () => {
-      activeTab = tab.dataset.tab;
-      renderTabs();
-      renderBody();
-    });
-  }
-  renderTabs();
+  buildPreviewModal();
+  document.addEventListener("keydown", handlePreviewKeydown);
   renderBody();
 }

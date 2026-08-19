@@ -73,7 +73,7 @@ plassholdere, slik at alt fungerer før nøkkelen er på plass.
 ### Endepunktet
 
 ```
-GET /api/smugmug?images=12&albums=6
+GET /api/smugmug?images=150
 GET /api/smugmug?debug=1        # tar med hvilke URI-er kontoen tilbyr
 ```
 
@@ -83,17 +83,21 @@ Svaret er trimmet ned til:
 {
   "source": "live",            // "live" | "demo" | "error"
   "images": [{ "id", "title", "webUri", "thumb", "display", "date" }],
-  "albums": [{ "id", "title", "webUri", "imageCount", "date", "cover" }],
   "warnings": []
 }
 ```
+
+Standard er 150 bilder (maks 300), hentet i sider av 50 fra SmugMug og satt
+sammen til én liste. Siden viser dem i et rutenett man kan scrolle i, og
+klikk på et bilde åpner en lokal forhåndsvisning (med forrige/neste) i
+stedet for å hoppe til SmugMug.
 
 ### Hvordan den finner dataene
 
 SmugMug er bygget rundt at man følger `Uris`-lenker i stedet for å hardkode
 stier, og hvilke URI-er en konto tilbyr varierer. Worker-en henter derfor
 `/api/v2/user/<nickname>` først, leser `Uris`-blokken, og bruker
-`UserRecentImages` og `UserAlbums` derfra — med fallback hvis de mangler.
+`UserRecentImages` derfra — med fallback hvis den mangler.
 
 Ser galleriet tomt ut, kall `/api/smugmug?debug=1`: den lister URI-ene kontoen
 din faktisk har, og `warnings` sier hva som feilet.
