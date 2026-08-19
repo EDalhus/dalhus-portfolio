@@ -760,6 +760,14 @@ body {
   flex: none;
 }
 
+.taskbar-apps {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
 .task-button:not([hidden]) {
   display: flex;
   align-items: center;
@@ -842,7 +850,9 @@ body {
     display: none;
   }
 
-  .taskbar {
+  /* Kun app-knappene scroller — IKKE .taskbar selv, siden Start-menyen er
+     posisjonert relativt til den og ville blitt klippet bort av overflow. */
+  .taskbar-apps {
     overflow-x: auto;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
@@ -855,7 +865,6 @@ body {
   }
 
   .start-button,
-  .taskbar-divider,
   .tray {
     flex: none;
   }

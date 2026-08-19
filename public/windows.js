@@ -57,7 +57,7 @@ function windowEl(name) {
 }
 
 function taskButtons(name) {
-  return $$(`.taskbar > [data-window-target="${name}"]`);
+  return $$(`.taskbar-apps [data-window-target="${name}"]`);
 }
 
 /* --- Posisjon / størrelse -------------------------------------------------- */
@@ -378,7 +378,7 @@ export function init({ windows, onOpen: onOpenHandler, onCloseIntercept: onClose
     attachResize(name);
   }
 
-  for (const button of $$(".taskbar > [data-window-target]")) {
+  for (const button of $$(".taskbar-apps [data-window-target]")) {
     button.addEventListener("click", () => toggle(button.dataset.windowTarget));
   }
 
