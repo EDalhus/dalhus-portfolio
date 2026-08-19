@@ -518,6 +518,47 @@ function buildStat(labelKey) {
   return { box, label, value };
 }
 
+/* Piltaster og mellomrom finnes ikke på en mobil skjerm — disse knappene
+   speiler nøyaktig samme trykk/slipp-oppførsel som handleKeydown/-keyup. */
+function buildTouchControls() {
+  const row = el("div", "pinball-controls-mobile");
+
+  const makeFlipperBtn = (label, flipperSide) => {
+    const btn = el("button", "btn pinball-touch-btn", label);
+    btn.type = "button";
+    const release = () => {
+      flippers[flipperSide].active = false;
+    };
+    btn.addEventListener("pointerdown", (event) => {
+      event.preventDefault();
+      if (phase === "playing") flippers[flipperSide].active = true;
+    });
+    btn.addEventListener("pointerup", release);
+    btn.addEventListener("pointerleave", release);
+    btn.addEventListener("pointercancel", release);
+    return btn;
+  };
+
+  const launchBtn = el("button", "btn pinball-touch-btn pinball-touch-launch", "⤒");
+  launchBtn.type = "button";
+  const releaseLaunch = () => {
+    if (charging) {
+      charging = false;
+      launchBall();
+    }
+  };
+  launchBtn.addEventListener("pointerdown", (event) => {
+    event.preventDefault();
+    if (phase === "playing" && !charging) charging = true;
+  });
+  launchBtn.addEventListener("pointerup", releaseLaunch);
+  launchBtn.addEventListener("pointerleave", releaseLaunch);
+  launchBtn.addEventListener("pointercancel", releaseLaunch);
+
+  row.append(makeFlipperBtn("◀", "left"), launchBtn, makeFlipperBtn("▶", "right"));
+  return row;
+}
+
 function build() {
   const root = document.querySelector("#pinball-body");
   if (!root) return;
@@ -537,7 +578,7 @@ function build() {
   overlayEl = el("div", "pinball-overlay");
   boardWrap.append(canvas, overlayEl);
 
-  wrap.append(side, boardWrap);
+  wrap.append(side, boardWrap, buildTouchControls());
   root.append(wrap);
 
   const dpr = window.devicePixelRatio || 1;

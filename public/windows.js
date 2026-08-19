@@ -35,7 +35,8 @@ const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selec
 const mediaQuery = window.matchMedia(DESKTOP_BREAKPOINT);
 const rects = new Map();
 const restoreRects = new Map();
-const openState = new Map();
+const openState = new Map(); // navn -> for øyeblikket synlig (false ved minimert ELLER lukket)
+const runningState = new Map(); // navn -> har en oppgavelinje-knapp (åpen eller minimert, men ikke lukket)
 
 let names = [];
 let desktop;
@@ -129,6 +130,11 @@ function setVisible(name, visible) {
   const wasOpen = openState.get(name) === true;
   win.hidden = !visible;
   openState.set(name, visible);
+
+  if (visible && !runningState.get(name)) {
+    runningState.set(name, true);
+    for (const button of taskButtons(name)) button.hidden = false;
+  }
   for (const button of taskButtons(name)) button.classList.toggle("is-active", visible);
 
   if (visible) {
@@ -143,9 +149,15 @@ export function open(name) {
   setVisible(name, true);
 }
 
+function minimize(name) {
+  setVisible(name, false);
+}
+
 export function close(name) {
   if (onCloseIntercept(name)) return;
   setVisible(name, false);
+  runningState.set(name, false);
+  for (const button of taskButtons(name)) button.hidden = true;
 }
 
 export function toggle(name) {
@@ -344,8 +356,10 @@ export function init({ windows, onOpen: onOpenHandler, onCloseIntercept: onClose
     const win = windowEl(name);
     if (!win) continue;
     openState.set(name, false);
+    runningState.set(name, false);
+    for (const button of taskButtons(name)) button.hidden = true;
 
-    win.querySelector('[data-action="minimize"]')?.addEventListener("click", () => setVisible(name, false));
+    win.querySelector('[data-action="minimize"]')?.addEventListener("click", () => minimize(name));
     win.querySelector('[data-action="maximize"]')?.addEventListener("click", () => toggleMaximize(name));
     win.querySelector('[data-action="close"]')?.addEventListener("click", () => close(name));
     win.addEventListener("pointerdown", () => focus(name));

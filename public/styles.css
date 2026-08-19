@@ -760,7 +760,7 @@ body {
   flex: none;
 }
 
-.task-button {
+.task-button:not([hidden]) {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -836,8 +836,33 @@ body {
     min-width: 0;
   }
 
+  .desktop-icons {
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+    gap: 6px 4px;
+  }
+
+  .desktop-icon {
+    width: 76px;
+  }
+
+  .taskbar {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
   .task-button {
-    max-width: 120px;
+    flex: none;
+    width: 108px;
+    max-width: none;
+  }
+
+  .start-button,
+  .taskbar-divider,
+  .tray {
+    flex: none;
   }
 }
 
@@ -1619,4 +1644,32 @@ body {
   margin: 4px 0 0;
   font-size: 11px;
   color: var(--w95-shadow);
+}
+
+.pinball-controls-mobile {
+  display: none;
+  width: 100%;
+  gap: 8px;
+  justify-content: center;
+  padding: 0 10px 10px;
+}
+
+.pinball-touch-btn {
+  min-width: 0;
+  flex: 1 1 auto;
+  max-width: 120px;
+  padding: 14px 4px;
+  font-size: 20px;
+  touch-action: none;
+  user-select: none;
+}
+
+.pinball-touch-launch {
+  font-size: 22px;
+}
+
+@media (max-width: 520px) {
+  .pinball-controls-mobile {
+    display: flex;
+  }
 }
