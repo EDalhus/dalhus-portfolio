@@ -924,6 +924,18 @@ body {
   text-align: center;
 }
 
+.gallery-loading-more {
+  margin: 10px 0 0;
+  padding: 8px;
+  text-align: center;
+  color: #3a3a3a;
+  font-size: 12px;
+}
+
+.gallery-sentinel {
+  height: 1px;
+}
+
 .notice {
   display: grid;
   grid-template-columns: 26px 1fr;

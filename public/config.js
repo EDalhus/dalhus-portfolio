@@ -43,9 +43,10 @@ export const PROJECTS = [
   },
 ];
 
-/** Hvor mange bilder galleriet ber om. */
+/** Galleriets bildeinnlasting: en første pulje, deretter flere ved scroll. */
 export const GALLERY = {
-  images: 150,
+  images: 100,
+  pageSize: 50,
   endpoint: "/api/smugmug",
 };
 
@@ -97,6 +98,7 @@ export const STRINGS = {
 
     "gallery.title": "Bilder — SmugMug",
     "gallery.loading": "Henter fra SmugMug …",
+    "gallery.loadingMore": "Henter flere bilder …",
     "gallery.retry": "Prøv igjen",
     "gallery.empty": "Ingenting å vise ennå.",
     "gallery.demoTitle": "Demomodus",
@@ -176,6 +178,7 @@ export const STRINGS = {
 
     "gallery.title": "Photos — SmugMug",
     "gallery.loading": "Fetching from SmugMug …",
+    "gallery.loadingMore": "Fetching more photos …",
     "gallery.retry": "Try again",
     "gallery.empty": "Nothing to show yet.",
     "gallery.demoTitle": "Demo mode",

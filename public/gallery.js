@@ -9,7 +9,12 @@ import { GALLERY, STRINGS, LOCALES } from "./config.js";
 
 let data = null;
 let loadPromise = null;
+let loadingMore = false;
 let lang = "no";
+
+let contentEl;
+let sentinelEl;
+let sentinelObserver;
 
 let previewBackdrop;
 let previewTitleEl;
@@ -39,12 +44,31 @@ function formatDate(iso) {
 
 /* --- Henting -------------------------------------------------------------- */
 
-async function load() {
-  const url = `${GALLERY.endpoint}?images=${GALLERY.images}`;
+async function fetchPage(count, offset) {
+  const url = `${GALLERY.endpoint}?images=${count}&offset=${offset}`;
   const res = await fetch(url, { headers: { accept: "application/json" } });
   const body = await res.json().catch(() => null);
   if (!body) throw new Error(`HTTP ${res.status}`);
   return body;
+}
+
+async function loadMore() {
+  if (loadingMore || !data || data.source !== "live" || !data.hasMore) return;
+  loadingMore = true;
+  renderBody();
+
+  try {
+    const offset = data.images.length;
+    const body = await fetchPage(GALLERY.pageSize, offset);
+    data.images.push(...(body.images || []));
+    data.hasMore = Boolean(body.hasMore);
+    if (body.warnings?.length) console.warn("[smugmug]", body.warnings.join(" | "));
+  } catch (error) {
+    console.warn("[smugmug] kunne ikke hente flere bilder:", error.message);
+  } finally {
+    loadingMore = false;
+    renderBody();
+  }
 }
 
 /* --- Notiser (demo / feil) ------------------------------------------------ */
@@ -99,40 +123,51 @@ function photoTile(image, index) {
 
 function renderBody() {
   const dict = STRINGS[lang];
-  const body = document.querySelector("#gallery-body");
   const status = document.querySelector("#gallery-status");
-  if (!body) return;
+  if (!contentEl) return;
 
-  body.textContent = "";
+  contentEl.textContent = "";
 
   if (!data) {
-    body.append(el("p", "gallery-message", dict["gallery.loading"]));
+    contentEl.append(el("p", "gallery-message", dict["gallery.loading"]));
     if (status) status.textContent = "";
+    updateSentinel();
     return;
   }
 
   if (data.source === "error") {
-    body.append(notice("error", dict["gallery.errorTitle"], data.reason || ""));
-    body.append(retryButton());
+    contentEl.append(notice("error", dict["gallery.errorTitle"], data.reason || ""));
+    contentEl.append(retryButton());
     if (status) status.textContent = "";
+    updateSentinel();
     return;
   }
 
   if (data.source === "demo") {
-    body.append(notice("info", dict["gallery.demoTitle"], data.reason || ""));
+    contentEl.append(notice("info", dict["gallery.demoTitle"], data.reason || ""));
   }
 
   const images = data.images || [];
 
   if (!images.length) {
-    body.append(el("p", "gallery-message", dict["gallery.empty"]));
+    contentEl.append(el("p", "gallery-message", dict["gallery.empty"]));
   } else {
     const grid = el("div", "tile-grid");
     images.forEach((image, index) => grid.append(photoTile(image, index)));
-    body.append(grid);
+    contentEl.append(grid);
+  }
+
+  if (loadingMore) {
+    contentEl.append(el("p", "gallery-loading-more", dict["gallery.loadingMore"]));
   }
 
   if (status) status.textContent = dict.photos(images.length);
+  updateSentinel();
+}
+
+function updateSentinel() {
+  if (!sentinelEl) return;
+  sentinelEl.hidden = !(data && data.source === "live" && data.hasMore !== false);
 }
 
 function retryButton() {
@@ -276,7 +311,7 @@ function handlePreviewKeydown(event) {
 
 export function start() {
   if (loadPromise) return loadPromise;
-  loadPromise = load()
+  loadPromise = fetchPage(GALLERY.images, 0)
     .then((payload) => {
       data = payload;
       if (payload.warnings?.length) {
@@ -297,7 +332,26 @@ export function setLanguage(next) {
   if (previewBackdrop && !previewBackdrop.hidden) renderPreview();
 }
 
+function buildScaffold() {
+  const root = document.querySelector("#gallery-body");
+  if (!root) return;
+
+  contentEl = el("div", "gallery-content");
+  sentinelEl = el("div", "gallery-sentinel");
+  sentinelEl.hidden = true;
+  root.append(contentEl, sentinelEl);
+
+  sentinelObserver = new IntersectionObserver(
+    (entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) loadMore();
+    },
+    { rootMargin: "400px" },
+  );
+  sentinelObserver.observe(sentinelEl);
+}
+
 export function init() {
+  buildScaffold();
   buildPreviewModal();
   document.addEventListener("keydown", handlePreviewKeydown);
   renderBody();

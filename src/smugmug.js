@@ -153,16 +153,22 @@ async function fetchUserUris(nickname, apiKey, apiRoot) {
 }
 
 /**
- * Henter opp til `count` bilder. SmugMug har ikke nødvendigvis et enkelt
- * kall som gir så mange på én gang, så vi paginerer i biter av PAGE_SIZE
- * med `start`/`count` til vi har nok eller går tom for bilder.
+ * Henter opp til `count` bilder, fra og med `offset` i den fulle listen
+ * (0-indeksert — «hent de neste 50 etter de 100 jeg allerede har»). SmugMug
+ * har ikke nødvendigvis et enkelt kall som gir så mange på én gang, så vi
+ * paginerer i biter av PAGE_SIZE med `start`/`count` til vi har nok eller
+ * går tom for bilder.
+ *
+ * Returnerer `hasMore: true` hvis vi fikk akkurat så mange som spurt om
+ * (det kan da finnes flere), og `false` hvis SmugMug ga oss færre enn
+ * bedt om (vi har nådd slutten av kontoens bilder).
  */
-async function fetchRecentImages(uris, apiKey, count, warnings, apiRoot) {
+async function fetchRecentImages(uris, apiKey, count, offset, warnings, apiRoot) {
   const candidates = ["UserRecentImages", "UserImageSearch", "UserFeaturedAlbums"];
   const key = candidates.find((name) => uriValue(uris[name]));
   if (!key) {
     warnings.push("Fant ingen URI for nye bilder på denne brukeren.");
-    return [];
+    return { images: [], hasMore: false };
   }
   if (key !== "UserRecentImages") {
     warnings.push(`Brukte ${key} som fallback for nye bilder.`);
@@ -170,7 +176,8 @@ async function fetchRecentImages(uris, apiKey, count, warnings, apiRoot) {
 
   const baseUri = uriValue(uris[key]);
   const images = [];
-  let start = 1; // SmugMug er 1-indeksert
+  let start = offset + 1; // SmugMug er 1-indeksert
+  let exhausted = false;
 
   while (images.length < count) {
     const pageCount = Math.min(PAGE_SIZE, count - images.length);
@@ -187,21 +194,24 @@ async function fetchRecentImages(uris, apiKey, count, warnings, apiRoot) {
       .filter(Boolean);
 
     images.push(...page);
-    if (page.length < pageCount) break; // ingen flere sider hos SmugMug
+    if (page.length < pageCount) {
+      exhausted = true;
+      break; // ingen flere sider hos SmugMug
+    }
     start += pageCount;
   }
 
-  return images.slice(0, count);
+  return { images: images.slice(0, count), hasMore: !exhausted };
 }
 
 /* -------------------------------------------------------------------------
    Demo-data, brukes når APIKey ikke er satt ennå
    ------------------------------------------------------------------------- */
 
-function demoPayload(imageCount) {
+function demoPayload(imageCount, offset) {
   const images = Array.from({ length: imageCount }, (_, i) => ({
-    id: `demo-image-${i}`,
-    title: `Demobilde ${i + 1}`,
+    id: `demo-image-${offset + i}`,
+    title: `Demobilde ${offset + i + 1}`,
     caption: "",
     webUri: null,
     thumb: null,
@@ -211,7 +221,7 @@ function demoPayload(imageCount) {
     date: null,
     demo: true,
   }));
-  return { images };
+  return { images, hasMore: true };
 }
 
 /* -------------------------------------------------------------------------
@@ -220,12 +230,13 @@ function demoPayload(imageCount) {
 
 export async function handleSmugmugRequest(request, env, ctx) {
   const url = new URL(request.url);
-  const imageCount = clamp(url.searchParams.get("images"), 150, 1, 300);
+  const imageCount = clamp(url.searchParams.get("images"), 100, 1, 200);
+  const offset = clamp(url.searchParams.get("offset"), 0, 0, 100_000);
   const debug = url.searchParams.get("debug") === "1";
 
   const cache = caches.default;
   const cacheKey = new Request(
-    `${url.origin}/api/smugmug?images=${imageCount}&debug=${debug ? 1 : 0}`,
+    `${url.origin}/api/smugmug?images=${imageCount}&offset=${offset}&debug=${debug ? 1 : 0}`,
     { method: "GET" },
   );
 
@@ -248,18 +259,23 @@ export async function handleSmugmugRequest(request, env, ctx) {
       reason: !apiKey
         ? "SMUGMUG_API_KEY er ikke satt (wrangler secret put SMUGMUG_API_KEY)."
         : "SMUGMUG_NICKNAME er ikke satt i wrangler.jsonc.",
-      ...demoPayload(imageCount),
+      ...demoPayload(imageCount, offset),
       warnings,
     };
   } else {
     try {
       const { user, uris } = await fetchUserUris(nickname, apiKey, apiRoot);
-      const images = await fetchRecentImages(uris, apiKey, imageCount, warnings, apiRoot).catch(
-        (error) => {
-          warnings.push(`Bilder: ${error.message}`);
-          return [];
-        },
-      );
+      const { images, hasMore } = await fetchRecentImages(
+        uris,
+        apiKey,
+        imageCount,
+        offset,
+        warnings,
+        apiRoot,
+      ).catch((error) => {
+        warnings.push(`Bilder: ${error.message}`);
+        return { images: [], hasMore: false };
+      });
 
       payload = {
         source: "live",
@@ -267,6 +283,7 @@ export async function handleSmugmugRequest(request, env, ctx) {
         profileUrl: user.WebUri || null,
         generatedAt: new Date().toISOString(),
         images,
+        hasMore,
         warnings,
         ...(debug ? { availableUris: Object.keys(uris).sort() } : {}),
       };
@@ -275,6 +292,7 @@ export async function handleSmugmugRequest(request, env, ctx) {
         source: "error",
         reason: error.message,
         images: [],
+        hasMore: false,
         warnings,
       };
     }

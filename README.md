@@ -76,7 +76,7 @@ plassholdere, slik at alt fungerer før nøkkelen er på plass.
 ### Endepunktet
 
 ```
-GET /api/smugmug?images=150
+GET /api/smugmug?images=100&offset=0
 GET /api/smugmug?debug=1        # tar med hvilke URI-er kontoen tilbyr
 ```
 
@@ -86,13 +86,19 @@ Svaret er trimmet ned til:
 {
   "source": "live",            // "live" | "demo" | "error"
   "images": [{ "id", "title", "webUri", "thumb", "display", "date" }],
+  "hasMore": true,             // finnes det flere bilder å hente etter disse?
   "warnings": []
 }
 ```
 
-Standard er 150 bilder (maks 300), hentet i sider av 50 fra SmugMug og satt
-sammen til én liste. Siden viser dem i et rutenett man kan scrolle i, og
-klikk på et bilde åpner en lokal forhåndsvisning (med forrige/neste) i
+`images` er hvor mange denne forespørselen skal gi (maks 200), `offset`
+er hvor i den fulle listen den skal starte (0-indeksert). Siden laster
+100 bilder først, og henter automatisk 50 til (`offset` = antall den
+allerede har) når du scroller til bunnen av galleriet — se
+`GALLERY.images`/`GALLERY.pageSize` i `public/config.js` og
+`loadMore()` i `public/gallery.js`. Hver side hentes i biter av 50 fra
+SmugMug internt og settes sammen til listen `images` returnerer.
+Klikk på et bilde åpner en lokal forhåndsvisning (med forrige/neste) i
 stedet for å hoppe til SmugMug.
 
 ### Hvordan den finner dataene
