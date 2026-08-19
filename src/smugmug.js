@@ -237,7 +237,7 @@ async function fetchAlbumImages(uris, albumPath, apiKey, count, offset, warnings
     return { images: [], hasMore: false, album: null };
   }
 
-  const data = await getJson(buildUrl(lookupUri, apiKey, { urlname: albumPath }, apiRoot));
+  const data = await getJson(buildUrl(lookupUri, apiKey, { urlpath: albumPath }, apiRoot));
   const { imagesUri, title, webUri } = findAlbumImagesUri(data?.Response);
 
   if (!imagesUri) {
