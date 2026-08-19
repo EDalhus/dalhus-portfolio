@@ -836,15 +836,10 @@ body {
     min-width: 0;
   }
 
+  /* Skrivebordsikonene tar bare plass fra toppen på mobil — Start-menyen
+     dekker akkurat samme "åpne et vindu"-funksjon. */
   .desktop-icons {
-    flex-direction: row;
-    flex-wrap: wrap;
-    width: 100%;
-    gap: 6px 4px;
-  }
-
-  .desktop-icon {
-    width: 76px;
+    display: none;
   }
 
   .taskbar {

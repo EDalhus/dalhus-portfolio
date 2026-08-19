@@ -232,6 +232,7 @@ function init() {
 
   $("#dlg-ok")?.addEventListener("click", () => {
     $("#shutdown-modal").hidden = true;
+    windows.forceClose("portfolio");
   });
 
   document.addEventListener("keydown", (event) => {

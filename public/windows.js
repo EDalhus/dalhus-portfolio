@@ -153,11 +153,21 @@ function minimize(name) {
   setVisible(name, false);
 }
 
-export function close(name) {
-  if (onCloseIntercept(name)) return;
+function performClose(name) {
   setVisible(name, false);
   runningState.set(name, false);
   for (const button of taskButtons(name)) button.hidden = true;
+}
+
+export function close(name) {
+  if (onCloseIntercept(name)) return;
+  performClose(name);
+}
+
+/** Lukker uten å spørre onCloseIntercept — for når intercepten selv (etter
+ * en bekreftelsesdialog e.l.) har bestemt at vinduet faktisk skal lukkes. */
+export function forceClose(name) {
+  performClose(name);
 }
 
 export function toggle(name) {
