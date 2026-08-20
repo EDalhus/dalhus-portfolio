@@ -1,0 +1,365 @@
+/* ==========================================================================
+   vista.css — Windows Vista/Aero-tema.
+
+   Denne filen er koblet inn i <head> med `disabled` fra start, og slås av/på
+   med linkens `.disabled`-egenskap (se app.js: applyTheme()). Siden den
+   lastes etter styles.css, trumfer reglene her de vanlige Win95-reglene med
+   samme selektor så lenge den er aktiv — ingen `[data-theme]`-prefiks
+   nødvendig på hver linje.
+
+   Skoper seg bevisst til "OS-skallet" (vinduer, knapper, taskbar,
+   Start-meny, skrivebord) — selve spillinnholdet (Tetris-brettet,
+   Minesveiper-cellene, flipperbanen) beholder sin egen retro-palett i
+   begge temaer, det er ikke noe en ekte Vista-maskin ville endret på heller.
+   ========================================================================== */
+
+:root {
+  --vista-text: #13283f;
+  --vista-radius: 8px;
+  --vista-radius-sm: 4px;
+  --font-vista: "Segoe UI", "Segoe UI Variable", "Helvetica Neue", system-ui, sans-serif;
+}
+
+/* --- Skrivebord ------------------------------------------------------------ */
+
+body {
+  font-family: var(--font-vista);
+  -webkit-font-smoothing: antialiased;
+  background:
+    conic-gradient(
+      from 200deg at 88% 92%,
+      rgba(255, 255, 255, 0.16) 0deg,
+      transparent 8deg,
+      transparent 22deg,
+      rgba(255, 255, 255, 0.12) 30deg,
+      transparent 38deg,
+      transparent 56deg,
+      rgba(255, 255, 255, 0.14) 64deg,
+      transparent 72deg,
+      transparent 360deg
+    ),
+    radial-gradient(circle at 88% 92%, rgba(255, 255, 255, 0.35), transparent 42%),
+    linear-gradient(135deg, #0a2430 0%, #0e3a45 28%, #135560 52%, #1c6f6a 74%, #3d9482 100%);
+  background-attachment: fixed;
+}
+
+.desktop-icon-label {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+}
+
+.desktop-icon:hover .desktop-icon-label,
+.desktop-icon:focus-visible .desktop-icon-label,
+.desktop-icon.is-selected .desktop-icon-label {
+  outline: none;
+  border-radius: var(--vista-radius-sm);
+  background: rgba(90, 160, 230, 0.55);
+  text-shadow: none;
+}
+
+/* --- Vindu ------------------------------------------------------------------ */
+
+.window {
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: var(--vista-radius) var(--vista-radius) 4px 4px;
+  background: rgba(240, 245, 251, 0.72);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  box-shadow:
+    0 18px 40px rgba(0, 15, 35, 0.4),
+    0 2px 8px rgba(0, 15, 35, 0.25);
+}
+
+.window.is-maximized {
+  border-radius: 0;
+}
+
+.title-bar {
+  border-radius: var(--vista-radius) var(--vista-radius) 0 0;
+  padding: 7px 8px 7px 10px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.88) 0%,
+    rgba(205, 228, 250, 0.6) 45%,
+    rgba(140, 190, 240, 0.55) 100%
+  );
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.window[data-window]:not(.is-focused) .title-bar {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(220, 226, 232, 0.4) 100%);
+}
+
+.window.is-maximized .title-bar {
+  border-radius: 0;
+}
+
+.title-bar-icon {
+  border-radius: 3px;
+}
+
+.title-bar-text {
+  color: var(--vista-text);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+  font-weight: 600;
+}
+
+.tb-btn {
+  width: 26px;
+  height: 22px;
+  border-radius: var(--vista-radius-sm);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(205, 222, 240, 0.7));
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 1px 2px rgba(0, 20, 40, 0.25);
+}
+
+.tb-btn:hover {
+  background: linear-gradient(180deg, #eaf4ff, #bcdcff);
+  box-shadow: 0 0 6px rgba(80, 160, 255, 0.6);
+}
+
+.tb-btn:active {
+  background: linear-gradient(180deg, #bcdcff, #eaf4ff);
+  box-shadow: inset 0 1px 3px rgba(0, 40, 80, 0.3);
+}
+
+.tb-btn[data-action="close"]:hover {
+  background: linear-gradient(180deg, #ff9a86, #dc3a24);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.tb-btn[data-action="close"]:hover .glyph {
+  background: #ffffff;
+}
+
+/* --- Menylinje --------------------------------------------------------------- */
+
+.menu-bar {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: none;
+  padding: 4px 8px;
+}
+
+.menu-item {
+  border-radius: var(--vista-radius-sm);
+  padding: 3px 8px;
+}
+
+.menu-item:hover {
+  background: rgba(110, 175, 240, 0.35);
+  color: var(--vista-text);
+}
+
+.btn-lang.is-active {
+  background: linear-gradient(180deg, #bfe0ff, #eef7ff);
+  background-image: none;
+  border-color: rgba(60, 140, 230, 0.8);
+  padding: 3px 8px;
+  font-weight: 700;
+}
+
+/* --- Knapper ------------------------------------------------------------------ */
+
+.btn {
+  font-family: var(--font-vista);
+  color: var(--vista-text);
+  border-radius: var(--vista-radius-sm);
+  border: 1px solid rgba(120, 150, 190, 0.55);
+  background: linear-gradient(180deg, #ffffff 0%, #dcebfa 45%, #bcdaf6 46%, #d7ebfc 100%);
+  box-shadow: 0 1px 2px rgba(0, 20, 40, 0.15);
+}
+
+.btn:hover {
+  background: linear-gradient(180deg, #ffffff 0%, #ecf6ff 45%, #cfe8ff 46%, #e9f5ff 100%);
+  border-color: rgba(90, 150, 210, 0.8);
+  box-shadow: 0 0 6px rgba(80, 160, 255, 0.5);
+}
+
+.btn:active,
+.btn.is-pressed {
+  background: linear-gradient(180deg, #bcdaf6 0%, #dcebfa 100%);
+  box-shadow: inset 0 1px 4px rgba(0, 40, 80, 0.3);
+  padding: 3px 12px;
+}
+
+.btn:focus-visible {
+  outline: 2px solid rgba(60, 140, 230, 0.6);
+  outline-offset: 1px;
+}
+
+/* --- Sunkne felt / statuslinje -------------------------------------------------- */
+
+.field-sunken {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(150, 180, 210, 0.5);
+  border-radius: var(--vista-radius-sm);
+  box-shadow: inset 0 1px 3px rgba(0, 40, 80, 0.15);
+}
+
+.status-bar {
+  gap: 6px;
+}
+
+.status-field {
+  border-radius: var(--vista-radius-sm);
+  border: 1px solid rgba(150, 180, 210, 0.4);
+  background: rgba(255, 255, 255, 0.55);
+}
+
+/* --- Fil-/prosjektliste ---------------------------------------------------------- */
+
+.file-item {
+  border-radius: var(--vista-radius-sm);
+}
+
+.file-item:hover {
+  background: rgba(110, 175, 240, 0.18);
+  border-color: transparent;
+}
+
+.file-item:focus-visible {
+  background: rgba(70, 140, 220, 0.85);
+  border-color: transparent;
+}
+
+.file-tags li {
+  border-radius: 999px;
+  border: 1px solid rgba(110, 175, 240, 0.4);
+  background: rgba(110, 175, 240, 0.22);
+}
+
+/* --- Faner (Tetris' Poengliste/Spill) -------------------------------------------- */
+
+.tab {
+  border-radius: 6px 6px 0 0;
+  border-color: transparent;
+  background: rgba(255, 255, 255, 0.35);
+  box-shadow: none;
+}
+
+.tab.is-active {
+  background: rgba(255, 255, 255, 0.85);
+  font-weight: 600;
+}
+
+.tab-panel {
+  border-radius: 0 0 var(--vista-radius-sm) var(--vista-radius-sm);
+  background: rgba(255, 255, 255, 0.85);
+}
+
+/* --- Notiser ----------------------------------------------------------------------- */
+
+.notice {
+  border-radius: 6px;
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+/* --- Modal / dialog ------------------------------------------------------------------ */
+
+.modal-backdrop {
+  background: rgba(8, 18, 32, 0.45);
+  backdrop-filter: blur(3px);
+}
+
+/* --- Oppgavelinje ---------------------------------------------------------------------- */
+
+.taskbar {
+  background: linear-gradient(180deg, rgba(46, 60, 84, 0.85), rgba(9, 15, 27, 0.93));
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 -8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.start-button {
+  width: 40px;
+  height: 40px;
+  min-width: 0;
+  padding: 0;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: radial-gradient(circle at 34% 28%, #92e691, #2f8f3c 55%, #1c5c26 100%);
+  box-shadow:
+    0 0 10px rgba(70, 220, 90, 0.55),
+    inset 0 2px 4px rgba(255, 255, 255, 0.5);
+}
+
+.start-button:active {
+  box-shadow:
+    0 0 6px rgba(70, 220, 90, 0.4),
+    inset 0 2px 6px rgba(0, 40, 10, 0.4);
+}
+
+.start-button span:last-child {
+  display: none;
+}
+
+.start-logo {
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.4));
+}
+
+.taskbar-divider {
+  border-left-color: rgba(255, 255, 255, 0.15);
+  border-right-color: rgba(255, 255, 255, 0.04);
+}
+
+.task-button:not([hidden]) {
+  border-radius: var(--vista-radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+  color: #eaf2fb;
+}
+
+.task-button:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.task-button.is-active {
+  background: rgba(120, 180, 240, 0.35);
+  background-image: none;
+  border-color: rgba(160, 200, 250, 0.6);
+  box-shadow: inset 0 0 8px rgba(120, 190, 255, 0.5);
+}
+
+.tray {
+  border-radius: var(--vista-radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+  color: #eaf2fb;
+}
+
+.tray-btn:hover,
+.tray-btn:focus-visible {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* --- Start-meny -------------------------------------------------------------------------- */
+
+.start-menu {
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(246, 249, 253, 0.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: 0 12px 30px rgba(0, 10, 30, 0.4);
+  padding: 6px;
+}
+
+.start-menu-item {
+  border-radius: 6px;
+  color: var(--vista-text);
+}
+
+.start-menu-item:hover,
+.start-menu-item:focus-visible {
+  outline: none;
+  background: linear-gradient(180deg, rgba(150, 200, 250, 0.9), rgba(90, 160, 230, 0.85));
+  border-color: transparent;
+  color: #ffffff;
+}

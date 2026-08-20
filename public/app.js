@@ -11,6 +11,7 @@ import * as pinball from "./pinball.js";
 import * as windows from "./windows.js";
 
 const STORAGE_KEY = "dalhus.lang";
+const THEME_STORAGE_KEY = "dalhus.theme";
 const SOUND_SELECTOR = "button, .desktop-icon, .file-item, .start-menu-item";
 
 const gallery = createGallery({ bodyId: "gallery-body", statusId: "gallery-status" });
@@ -46,6 +47,37 @@ function storeLang(lang) {
   } catch {
     /* ignorer */
   }
+}
+
+/* --- Tema (Windows 95 / Vista) ---------------------------------------------- */
+
+function readStoredTheme() {
+  try {
+    const stored = localStorage.getItem(THEME_STORAGE_KEY);
+    if (stored === "win95" || stored === "vista") return stored;
+  } catch {
+    /* localStorage kan være blokkert */
+  }
+  return "win95";
+}
+
+function storeTheme(theme) {
+  try {
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
+  } catch {
+    /* ignorer */
+  }
+}
+
+function applyTheme(theme) {
+  const vistaLink = $("#theme-vista-link");
+  if (vistaLink) vistaLink.disabled = theme !== "vista";
+  document.documentElement.dataset.theme = theme;
+
+  const toggle = $("#theme-toggle");
+  if (toggle) toggle.setAttribute("aria-pressed", String(theme === "vista"));
+
+  storeTheme(theme);
 }
 
 /* --- Prosjektliste -------------------------------------------------------- */
@@ -199,6 +231,11 @@ function initSounds() {
 /* --- Oppstart ------------------------------------------------------------- */
 
 function init() {
+  applyTheme(readStoredTheme());
+  $("#theme-toggle")?.addEventListener("click", () => {
+    applyTheme(document.documentElement.dataset.theme === "vista" ? "win95" : "vista");
+  });
+
   gallery.init();
   gathering.init();
   tetris.init();

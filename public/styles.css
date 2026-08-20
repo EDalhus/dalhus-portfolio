@@ -807,11 +807,35 @@ body {
 }
 
 .tray {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   margin-left: auto;
   padding: 2px 8px;
   border: 1px solid;
   border-color: var(--w95-shadow) var(--w95-white) var(--w95-white) var(--w95-shadow);
   font-variant-numeric: tabular-nums;
+}
+
+.tray-btn {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  min-width: 0;
+  font-size: 13px;
+  line-height: 1;
+  background: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.tray-btn:hover,
+.tray-btn:focus-visible {
+  outline: none;
+  border-color: var(--w95-shadow);
+  background: var(--w95-light);
 }
 
 /* --- Mobil --------------------------------------------------------------- */

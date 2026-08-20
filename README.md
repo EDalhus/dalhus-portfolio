@@ -20,9 +20,10 @@ Ingen byggesteg, ingen rammeverk, ingen avhengigheter i nettleseren.
 │   └── leaderboard.js    # Tetris-highscore i Workers KV
 └── public/               # Serveres statisk fra Cloudflares edge
     ├── index.html
-    ├── styles.css        # Hele Win95-temaet
+    ├── styles.css        # Hele Win95-temaet (standard)
+    ├── vista.css         # Windows Vista/Aero-tema — lastes disabled, se «Tema»
     ├── config.js         # Prosjekter, tekster, galleri-/Tetris-innstillinger
-    ├── app.js            # Skall: språk, klokke, klikkelyder
+    ├── app.js            # Skall: språk, tema, klokke, klikkelyder
     ├── windows.js        # Vindusbehandler: åpne/dra/endre størrelse, Start-meny
     ├── gallery.js        # createGallery() — driver både SmugMug- og The Gathering-vinduet
     ├── tetris.js         # Spillmotor + highscore-liste
@@ -192,6 +193,33 @@ navnet, men det finnes ingen server-side verifisering av at scoren faktisk
 ble spilt — hvem som helst kan POSTe en falsk highscore direkte mot
 endepunktet. Helt greit for en portefølje-lekeplass, men ikke bygg videre på
 dette uten å tenke gjennom det hvis det noen gang blir mer enn det.
+
+## Tema
+
+🎨-knappen i systemkurven (ved klokka) bytter mellom to temaer:
+
+- **Windows 95** — standard, harde piksel-bevels, MS Sans Serif.
+- **Windows Vista/Aero** — glassaktige, gjennomsiktige vinduer med
+  `backdrop-filter: blur()`, avrundede hjørner, en rund grønn Start-orb,
+  og en mørk gjennomsiktig oppgavelinje. Ingen ekte Vista-bilder eller
+  -fonter er brukt — alt er håndtegnet CSS (gradienter, `conic-gradient`
+  for "Aurora"-bakgrunnen), i tråd med resten av siden.
+
+Valget lagres i `localStorage` (samme mønster som språkvalget) og huskes
+neste besøk.
+
+**Arkitektur:** `public/vista.css` lastes alltid inn i `<head>`, men med
+`disabled` fra start. `applyTheme()` i `public/app.js` slår den av/på via
+`link.disabled` — siden den ligger etter `styles.css` i dokumentet, trumfer
+reglene der de vanlige Win95-reglene med samme selektor når den er aktiv,
+uten at noe trenger et `[data-theme]`-prefiks. Temaet er bevisst avgrenset
+til selve "OS-skallet" (vinduer, knapper, taskbar, Start-meny, skrivebord)
+— spillinnholdet (Tetris-brettet, Minesveiper-cellene, flipperbanen)
+beholder sin egen retro-palett i begge temaer.
+
+Vil du legge til et tredje tema, følg samme oppskrift: en ny
+`public/<navn>.css`, en ny `<link ... disabled>` i `index.html`, og en
+gren til i `applyTheme()`.
 
 ## Minesveiper
 
