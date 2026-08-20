@@ -129,7 +129,12 @@ function build() {
   bubble.append(tipText, dismissBtn);
 
   const body = el("div", "clippy-body");
-  body.append(el("span", "clippy-face", "📎"), el("span", "clippy-eyes", ""));
+  const face = document.createElement("img");
+  face.className = "clippy-face";
+  face.src = "/clippy.png";
+  face.alt = "Clippy";
+  face.draggable = false;
+  body.append(face);
 
   widget.append(bubble, body);
   document.body.append(widget);
