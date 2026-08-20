@@ -84,6 +84,45 @@ export const PINBALL = {
   startBalls: 3,
 };
 
+/** Kortstørrelse for Kabal (piksler). */
+export const SOLITAIRE = {
+  cardWidth: 54,
+  cardHeight: 76,
+  faceUpOffset: 20,
+  faceDownOffset: 8,
+};
+
+/**
+ * Clippys tips — rullerer når man klikker ham. Rent for gøy, ingen logikk
+ * bak innholdet.
+ */
+export const CLIPPY_TIPS = {
+  no: [
+    "Det ser ut som du prøver å se på en portefølje. Vil du ha hjelp med det?",
+    "Visste du at du kan dra vinduene rundt etter tittellinjen?",
+    "Psst — prøv Vista-temaet i systemkurven, oppe til høyre der nede.",
+    "Jeg heter Binders. Eller Clippy. Ingen er helt sikre lenger.",
+    "Highscore-lista i Tetris er offentlig for alle. Ingen press.",
+    "Du kan endre størrelse på et vindu ved å dra i et hjørne.",
+    "Jeg har ikke vært klarert siden 2007, men jeg prøver mitt beste.",
+    "Minesveiper-flagg settes med høyreklikk. Eller «Flagg-modus» på mobil.",
+    "Hvis du lukker Portefølje-vinduet, kommer det opp en overraskelse.",
+    "Jeg dukker ikke opp igjen med mindre du klikker meg frem i systemkurven.",
+  ],
+  en: [
+    "It looks like you're trying to view a portfolio. Would you like help with that?",
+    "Did you know you can drag windows around by their title bar?",
+    "Psst — try the Vista theme in the system tray, down there on the right.",
+    "My name's Binders. Or Clippy. Nobody's really sure anymore.",
+    "The Tetris high score list is public for everyone. No pressure.",
+    "You can resize a window by dragging one of its corners.",
+    "I haven't been trusted since 2007, but I'm doing my best.",
+    "Right-click flags a Minesweeper cell. Or use \"Flag mode\" on mobile.",
+    "Closing the Portfolio window has a little surprise waiting.",
+    "I won't come back unless you click me back on from the system tray.",
+  ],
+};
+
 /** Tekster i to språk. Nøklene matcher data-i18n i index.html. */
 export const STRINGS = {
   no: {
@@ -165,6 +204,12 @@ export const STRINGS = {
     "pinball.yourScore": "Din poengsum",
     "pinball.controls.hint": "◀ ▶: flippere · Mellomrom: skyt ut ballen · P: pause",
     "pinball.launch": "Hold Mellomrom for å skyte ut",
+
+    "solitaire.title": "Kabal",
+    "solitaire.newGame": "Nytt spill",
+    "solitaire.hint": "Klikk for å velge · dobbeltklikk for å sende til fundament",
+    "solitaire.won": "Du vant! 🎉",
+    "solitaire.moves": "Trekk",
   },
   en: {
     docTitle: "Eirik Dalhus — Portfolio",
@@ -245,6 +290,12 @@ export const STRINGS = {
     "pinball.yourScore": "Your score",
     "pinball.controls.hint": "◀ ▶: flippers · Space: launch ball · P: pause",
     "pinball.launch": "Hold Space to launch",
+
+    "solitaire.title": "Solitaire",
+    "solitaire.newGame": "New game",
+    "solitaire.hint": "Click to select · double-click to send to a foundation",
+    "solitaire.won": "You won! 🎉",
+    "solitaire.moves": "Moves",
   },
 };
 

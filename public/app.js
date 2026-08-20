@@ -8,6 +8,8 @@ import { createGallery } from "./gallery.js";
 import * as tetris from "./tetris.js";
 import * as minesweeper from "./minesweeper.js";
 import * as pinball from "./pinball.js";
+import * as solitaire from "./solitaire.js";
+import * as clippy from "./clippy.js";
 import * as windows from "./windows.js";
 
 const STORAGE_KEY = "dalhus.lang";
@@ -173,6 +175,8 @@ function applyLanguage(lang) {
   tetris.setLanguage(lang);
   minesweeper.setLanguage(lang);
   pinball.setLanguage(lang);
+  solitaire.setLanguage(lang);
+  clippy.setLanguage(lang);
   updateClock();
   storeLang(lang);
 }
@@ -241,9 +245,11 @@ function init() {
   tetris.init();
   minesweeper.init();
   pinball.init();
+  solitaire.init();
+  clippy.init();
 
   windows.init({
-    windows: ["portfolio", "gallery", "gathering", "tetris", "minesweeper", "pinball"],
+    windows: ["portfolio", "gallery", "gathering", "tetris", "minesweeper", "pinball", "solitaire"],
     onOpen: (name) => {
       if (name === "gallery") gallery.start();
       if (name === "gathering") gathering.start();

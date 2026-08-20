@@ -148,9 +148,9 @@ oppfører seg, men ikke verifisert mot et ekte svar. Fungerer ikke
 Over 520px bredde oppfører vinduene seg som ekte Windows 95-vinduer:
 
 - Skrivebordsikonene («Portfolio», «SmugMug», «The Gathering 2026», «Tetris»,
-  «Minesveiper», «3D Flipperspill») åpner vinduene — de er lukket til man
-  klikker, bortsett fra SmugMug-galleriet som åpnes automatisk med det samme
-  siden lastes.
+  «Minesveiper», «3D Flipperspill», «Kabal») åpner vinduene — de er lukket til
+  man klikker, bortsett fra SmugMug-galleriet som åpnes automatisk med det
+  samme siden lastes.
 - Tittellinjen kan dras for å flytte vinduet.
 - Hjørnene kan dras for å endre størrelse (minimum ca. 280×220px).
 - Start-knappen åpner en Start-meny som henger fast over oppgavelinjen og
@@ -243,6 +243,26 @@ Banens vegger er definert som en liste linjesegmenter i `WALLS`
 importert fra noe sted. Vil du justere formen, er det her du gjør det; pass på
 at hvert segment faktisk møter det neste (et gap, selv på under en pikselbredde
 mellom to vegger, lar ballen falle rett gjennom).
+
+## Kabal
+
+Klassisk Klondike-kabal (`public/solitaire.js`), helt lokalt — ingen
+server-data. Interaksjonen er trykk-for-å-velge / trykk-for-å-flytte i stedet
+for dra-og-slipp, slik at den fungerer likt med mus og touch: klikk et kort
+(eller en gyldig sekvens øverst i en tablå-kolonne) for å velge det, klikk så
+en fundament- eller tablå-bunke for å flytte det dit. Dobbeltklikk et kort
+sender det automatisk til et fundament hvis det er et gyldig trekk. Klikk
+stokken for å trekke, eller for å stokke kastebunken tilbake når stokken er
+tom.
+
+## Clippy
+
+Kontorassistenten fra gamle dager (`public/clippy.js`), gjenopplivet som en
+frittstående 📎-widget som flyter over resten av skrivebordet — den er ikke
+et vindu i vindussystemet. Klikk ham for å bla til neste tips, dra ham dit du
+vil ha ham, eller lukk ham med krysset på boblen. Om du jager ham vekk dukker
+det opp en liten 📎-knapp i systemkurven for å hente ham tilbake; valget
+huskes i `localStorage`. Tipsene ligger i `CLIPPY_TIPS` i `public/config.js`.
 
 ## Legge til et prosjekt
 

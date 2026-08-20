@@ -20,6 +20,7 @@ const DEFAULTS = {
   tetris: { width: 460, height: 560, x: 200, y: 60 },
   minesweeper: { width: 320, height: 420, x: 260, y: 100 },
   pinball: { width: 580, height: 720, x: 320, y: 20 },
+  solitaire: { width: 720, height: 640, x: 180, y: 40 },
 };
 
 const CORNER_DELTAS = {
