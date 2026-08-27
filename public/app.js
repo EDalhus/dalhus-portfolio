@@ -3,9 +3,9 @@
    Innhold ligger i config.js, galleriet i gallery.js, vinduene i windows.js.
    ========================================================================== */
 
-import { PROJECTS, STRINGS, LOCALES, GATHERING_ALBUM_PATH, SDOK_FOLDER_PATH } from "./config.js";
+import { PROJECTS, STRINGS, LOCALES, SMUGMUG_FOLDERS } from "./config.js";
 import { createGallery } from "./gallery.js";
-import * as sdokGalleries from "./sdok-galleries.js";
+import * as folderGalleries from "./folder-galleries.js";
 import * as clippy from "./clippy.js";
 import * as windows from "./windows.js";
 
@@ -14,11 +14,6 @@ const THEME_STORAGE_KEY = "dalhus.theme";
 const SOUND_SELECTOR = "button, .desktop-icon, .file-item, .start-menu-item";
 
 const gallery = createGallery({ bodyId: "gallery-body", statusId: "gallery-status" });
-const gathering = createGallery({
-  bodyId: "gathering-body",
-  statusId: "gathering-status",
-  extraParams: { album: GATHERING_ALBUM_PATH },
-});
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
@@ -168,8 +163,7 @@ function applyLanguage(lang) {
 
   renderProjects(lang);
   gallery.setLanguage(lang);
-  gathering.setLanguage(lang);
-  sdokGalleries.setLanguage(lang);
+  folderGalleries.setLanguage(lang);
   clippy.setLanguage(lang);
   updateClock();
   storeLang(lang);
@@ -235,15 +229,13 @@ function init() {
   });
 
   gallery.init();
-  gathering.init();
   clippy.init();
 
   windows.init({
-    windows: ["portfolio", "gallery", "gathering"],
+    windows: ["portfolio", "gallery"],
     onOpen: (name) => {
       if (name === "gallery") gallery.start();
-      if (name === "gathering") gathering.start();
-      if (sdokGalleries.has(name)) sdokGalleries.start(name);
+      if (folderGalleries.has(name)) folderGalleries.start(name);
     },
     onCloseIntercept: (name) => {
       if (name !== "portfolio") return false;
@@ -253,10 +245,10 @@ function init() {
     },
   });
 
-  // Ett ikon per galleri i SmugMug-mappen. Ikke ventet på — skrivebordet er
-  // klart uansett, ikonene kommer når lista er hentet.
-  sdokGalleries.init(SDOK_FOLDER_PATH).catch((error) => {
-    console.warn("[sdok] kunne ikke bygge galleri-ikoner:", error);
+  // Ett ikon per galleri i SmugMug-mappene. Ikke ventet på — skrivebordet er
+  // klart uansett, ikonene kommer når listene er hentet.
+  folderGalleries.init(SMUGMUG_FOLDERS).catch((error) => {
+    console.warn("[gallerier] kunne ikke bygge ikoner:", error);
   });
 
   applyLanguage(readStoredLang());

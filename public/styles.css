@@ -150,7 +150,7 @@ body {
 }
 
 /* Dynamiske galleri-ikoner: SmugMug-miniatyren settes som background-image
-   inline av sdok-galleries.js. */
+   inline av folder-galleries.js. */
 .desktop-icon-glyph-thumb {
   background-position: center !important;
   background-size: cover !important;

@@ -2,8 +2,8 @@
 
 Statisk porteføljeside i Windows 95-stil, servert fra Cloudflare Workers med
 [Static Assets](https://developers.cloudflare.com/workers/static-assets/). Et
-SmugMug-galleri med kontoens siste bilder, et eget vindu for The Gathering
-2026, og ett skrivebordsikon per galleri i en valgt SmugMug-mappe.
+SmugMug-galleri med kontoens siste bilder, og ett skrivebordsikon per galleri
+i valgte SmugMug-mapper.
 
 Ingen byggesteg, ingen rammeverk, ingen avhengigheter i nettleseren.
 
@@ -20,11 +20,11 @@ Ingen byggesteg, ingen rammeverk, ingen avhengigheter i nettleseren.
     ├── index.html
     ├── styles.css        # Hele Win95-temaet (standard)
     ├── vista.css         # Windows Vista/Aero-tema — lastes disabled, se «Tema»
-    ├── config.js         # Prosjekter, tekster, galleri-innstillinger, SmugMug-mappe
+    ├── config.js         # Prosjekter, tekster, galleri-innstillinger, SmugMug-mapper
     ├── app.js            # Skall: språk, tema, klokke, klikkelyder
     ├── windows.js        # Vindusbehandler: åpne/dra/endre størrelse, Start-meny
     ├── gallery.js        # createGallery() — driver hvert galleri-vindu
-    ├── sdok-galleries.js # Ett ikon + vindu per galleri i SmugMug-mappen
+    ├── folder-galleries.js # Ett ikon + vindu per galleri i SmugMug-mappene
     ├── clippy.js         # Clippy-widgeten
     ├── _headers          # Sikkerhetsheadere for de statiske filene
     ├── 404.html
@@ -77,7 +77,7 @@ plassholdere, slik at alt fungerer før nøkkelen er på plass.
 ```
 GET /api/smugmug?images=100&offset=0
 GET /api/smugmug?album=/FA/KANDU/TG26H   # ett bestemt album
-GET /api/smugmug?folder=/FA/SDOK         # listen med gallerier i en mappe
+GET /api/smugmug?folder=/FA/KANDU        # listen med gallerier i en mappe
 GET /api/smugmug?debug=1                 # tar med hvilke URI-er kontoen tilbyr
 ```
 
@@ -139,7 +139,7 @@ albumets `AlbumImages`-lenke, og henter/paginerer derfra på samme måte som
 ### Galleriene i en mappe (`?folder=`)
 
 ```
-GET /api/smugmug?folder=/FA/SDOK
+GET /api/smugmug?folder=/FA/KANDU
 ```
 
 Slår opp mappe-stien via `UrlPathLookup`, følger `FolderAlbums`-lenken, og
@@ -148,7 +148,7 @@ returnerer ett innslag per galleri i mappen:
 ```jsonc
 {
   "source": "live",
-  "folder": { "name": "SDOK", "webUri": "https://…/FA/SDOK" },
+  "folder": { "name": "KANDU", "webUri": "https://…/FA/KANDU" },
   "albums": [
     { "name", "path", "webUri", "thumb", "imageCount", "date" }
   ],
@@ -156,10 +156,10 @@ returnerer ett innslag per galleri i mappen:
 }
 ```
 
-`public/sdok-galleries.js` kaller dette ved lasting og bygger ett
-skrivebordsikon + galleri-vindu per `albums`-innslag (mappen er satt som
-`SDOK_FOLDER_PATH` i `public/config.js`). Legger du til et galleri i
-SmugMug-mappen, dukker ikonet opp av seg selv neste gang siden lastes —
+`public/folder-galleries.js` kaller dette for hver mappe i `SMUGMUG_FOLDERS`
+(`public/config.js`, i dag `/FA/SDOK` og `/FA/KANDU`) ved lasting, og bygger
+ett skrivebordsikon + galleri-vindu per galleri. Legger du til et galleri i
+en av mappene, dukker ikonet opp av seg selv neste gang siden lastes —
 ingenting å redigere. `!albums` er rekursiv, så gallerier i eventuelle
 undermapper havner også i lista.
 
@@ -167,9 +167,9 @@ undermapper havner også i lista.
 
 Over 520px bredde oppfører vinduene seg som ekte Windows 95-vinduer:
 
-- Skrivebordsikonene åpner vinduene. Faste ikoner: «Portefølje», «SmugMug»
-  (kontoens siste bilder) og «The Gathering 2026». I tillegg ett ikon per
-  galleri i SmugMug-mappen (se `?folder=` over).
+- Skrivebordsikonene åpner vinduene. Faste ikoner: «Portefølje» og «SmugMug»
+  (kontoens siste bilder). I tillegg ett ikon per galleri i mappene i
+  `SMUGMUG_FOLDERS` (se `?folder=` over).
 - Ingenting åpnes automatisk — siden viser bare skrivebordet med ikonene, og
   man velger selv hva som skal åpnes.
 - Tittellinjen kan dras for å flytte vinduet.

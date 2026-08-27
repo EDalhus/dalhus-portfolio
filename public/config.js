@@ -51,20 +51,14 @@ export const GALLERY = {
 };
 
 /**
- * Eget vindu for ett bestemt SmugMug-album (The Gathering 2026), i stedet
- * for kontoens siste bilder. Stien er den samme som i den pene URL-en
- * (https://eirikdalhus.smugmug.com/FA/KANDU/TG26H → "/FA/KANDU/TG26H").
+ * SmugMug-mappene skrivebordet lager ett ikon per galleri av. Stiene er de
+ * samme som i de pene URL-ene (https://eirikdalhus.smugmug.com/FA/SDOK →
+ * "/FA/SDOK"). Worker-en lister galleriene i hver mappe via
+ * /api/smugmug?folder=<sti>, og folder-galleries.js bygger ett ikon + vindu
+ * per galleri — legger du til et galleri i SmugMug, dukker ikonet opp av seg
+ * selv. `!albums` er rekursiv, så gallerier i undermapper blir også med.
  */
-export const GATHERING_ALBUM_PATH = "/FA/KANDU/TG26H";
-
-/**
- * SmugMug-mappen som skrivebordet lager ett ikon per galleri av. Stien er den
- * samme som i den pene URL-en (https://eirikdalhus.smugmug.com/FA/SDOK →
- * "/FA/SDOK"). Worker-en lister galleriene i mappen via
- * /api/smugmug?folder=<sti>, og app.js bygger ett ikon + vindu per galleri —
- * legger du til et galleri i SmugMug, dukker ikonet opp av seg selv.
- */
-export const SDOK_FOLDER_PATH = "/FA/SDOK";
+export const SMUGMUG_FOLDERS = ["/FA/SDOK", "/FA/KANDU"];
 
 /**
  * Clippys tips — rullerer når man klikker ham. Rent for gøy, ingen logikk

@@ -25,11 +25,7 @@
           <span class="desktop-icon-glyph desktop-icon-glyph-photo" aria-hidden="true"></span>
           <span class="desktop-icon-label">SmugMug</span>
         </button>
-        <button type="button" class="desktop-icon" data-icon-target="gathering">
-          <span class="desktop-icon-glyph desktop-icon-glyph-photo" aria-hidden="true"></span>
-          <span class="desktop-icon-label">The Gathering 2026</span>
-        </button>
-        <!-- Ett ikon per galleri i SmugMug-mappen legges til her av app.js -->
+        <!-- Ett ikon per galleri i SmugMug-mappene legges til her av app.js -->
       </div>
 
       <!-- ================= Vindu 1: portefølje ================= -->
@@ -122,40 +118,6 @@
         </div>
       </section>
 
-      <!-- ================= Vindu: The Gathering 2026 ================= -->
-      <section class="window" data-window="gathering" role="region" aria-label="The Gathering 2026" hidden>
-        <span class="resize-handle resize-nw" data-resize="nw" aria-hidden="true"></span>
-        <span class="resize-handle resize-ne" data-resize="ne" aria-hidden="true"></span>
-        <span class="resize-handle resize-sw" data-resize="sw" aria-hidden="true"></span>
-        <span class="resize-handle resize-se" data-resize="se" aria-hidden="true"></span>
-        <div class="title-bar">
-          <span class="title-bar-icon title-bar-icon-photo" aria-hidden="true"></span>
-          <h2 class="title-bar-text">The Gathering 2026</h2>
-          <div class="title-bar-controls">
-            <button type="button" class="tb-btn" data-action="minimize" aria-label="Minimer">
-              <span class="glyph glyph-min" aria-hidden="true"></span>
-            </button>
-            <button type="button" class="tb-btn" data-action="maximize" aria-label="Maksimer">
-              <span class="glyph glyph-max" aria-hidden="true"></span>
-            </button>
-            <button type="button" class="tb-btn" data-action="close" aria-label="Lukk">
-              <span class="glyph glyph-close" aria-hidden="true"></span>
-            </button>
-          </div>
-        </div>
-
-        <div class="window-body">
-          <div class="tab-panel field-sunken" id="gathering-body">
-            <!-- Fylles av gallery.js (createGallery) -->
-          </div>
-        </div>
-
-        <div class="status-bar">
-          <span class="status-field" id="gathering-status"></span>
-          <span class="status-field" data-i18n="status.hint">Klikk for å åpne</span>
-        </div>
-      </section>
-
       <!-- "Slå av"-dialog -->
       <div class="modal-backdrop" id="shutdown-modal" hidden>
         <div class="window dialog" role="dialog" aria-modal="true" aria-labelledby="dlg-title">
@@ -199,12 +161,6 @@
               <span>SmugMug</span>
             </button>
           </li>
-          <li role="none">
-            <button type="button" class="start-menu-item" role="menuitem" data-window-target="gathering">
-              <span class="task-icon task-icon-photo" aria-hidden="true"></span>
-              <span>The Gathering 2026</span>
-            </button>
-          </li>
         </ul>
       </div>
       <div class="taskbar-apps">
@@ -216,10 +172,6 @@
         <button type="button" class="btn task-button" data-window-target="gallery" hidden>
           <span class="task-icon task-icon-photo" aria-hidden="true"></span>
           <span>SmugMug</span>
-        </button>
-        <button type="button" class="btn task-button" data-window-target="gathering" hidden>
-          <span class="task-icon task-icon-photo" aria-hidden="true"></span>
-          <span>The Gathering 2026</span>
         </button>
       </div>
       <div class="tray">

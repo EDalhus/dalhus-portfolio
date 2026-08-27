@@ -1,11 +1,12 @@
 /* ==========================================================================
-   sdok-galleries.js — ett skrivebordsikon + vindu per galleri i en SmugMug-mappe.
+   folder-galleries.js — ett skrivebordsikon + vindu per galleri i en eller
+   flere SmugMug-mapper.
 
-   Worker-en lister galleriene via /api/smugmug?folder=<sti>. For hvert galleri
-   bygger vi det samme oppsettet index.html har for et fast galleri-vindu
-   (ikon, vindu, oppgavelinje-knapp, Start-meny-linje) og kobler det på
-   vindusbehandleren med windows.mountWindow(). Legger du til et galleri i
-   SmugMug, dukker det opp her av seg selv ved neste lasting.
+   Worker-en lister galleriene i en mappe via /api/smugmug?folder=<sti>. For
+   hvert galleri bygger vi det samme oppsettet index.html har for et fast
+   galleri-vindu (ikon, vindu, oppgavelinje-knapp, Start-meny-linje) og kobler
+   det på vindusbehandleren med windows.mountWindow(). Legger du til et galleri
+   i SmugMug, dukker det opp her av seg selv ved neste lasting.
    ========================================================================== */
 
 import { createGallery } from "./gallery.js";
@@ -15,14 +16,14 @@ import * as windows from "./windows.js";
 const galleries = new Map(); // vindusnavn -> galleri-kontroller fra createGallery()
 let currentLang = "no";
 
-/** Gjør en album-sti om til et stabilt, unikt vindusnavn: /FA/SDOK/SET20 → "sdok-set20". */
+/** Gjør en album-sti om til et stabilt, unikt vindusnavn: /FA/KANDU/TG26H → "gal-fa-kandu-tg26h". */
 function windowName(path, taken) {
-  const leaf = (path.split("/").filter(Boolean).pop() || "galleri")
+  const slug = path
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
-  let name = `sdok-${leaf || "galleri"}`;
-  for (let n = 2; taken.has(name); n += 1) name = `sdok-${leaf}-${n}`;
+  let name = `gal-${slug || "galleri"}`;
+  for (let n = 2; taken.has(name); n += 1) name = `gal-${slug}-${n}`;
   taken.add(name);
   return name;
 }
@@ -123,22 +124,27 @@ function buildWindow(name, title) {
   return section;
 }
 
-/** Henter mappe-listen og bygger et ikon + vindu per galleri. */
-export async function init(folderPath) {
-  let payload;
+async function fetchFolder(folderPath) {
   try {
     const res = await fetch(`/api/smugmug?folder=${encodeURIComponent(folderPath)}`, {
       headers: { accept: "application/json" },
     });
-    payload = await res.json();
+    const payload = await res.json();
+    if (payload?.warnings?.length) console.warn(`[gallerier ${folderPath}]`, payload.warnings.join(" | "));
+    return Array.isArray(payload?.albums) ? payload.albums : [];
   } catch (error) {
-    console.warn("[sdok] kunne ikke hente mappe:", error.message);
-    return;
+    console.warn(`[gallerier ${folderPath}] kunne ikke hente mappe:`, error.message);
+    return [];
   }
+}
 
-  if (payload?.warnings?.length) console.warn("[sdok]", payload.warnings.join(" | "));
-
-  const albums = Array.isArray(payload?.albums) ? payload.albums : [];
+/**
+ * Henter mappe-listene og bygger et ikon + vindu per galleri.
+ * @param {string[]} folderPaths — SmugMug-mappestier, f.eks. ["/FA/SDOK", "/FA/KANDU"]
+ */
+export async function init(folderPaths) {
+  const lists = await Promise.all(folderPaths.map(fetchFolder));
+  const albums = lists.flat().filter((album) => album?.path);
   if (!albums.length) return;
 
   const iconContainer = document.querySelector(".desktop-icons");
@@ -148,10 +154,13 @@ export async function init(folderPath) {
   const modal = document.querySelector("#shutdown-modal");
   if (!iconContainer || !taskbarApps || !startList || !desktop) return;
 
-  const taken = new Set(["portfolio", "gallery", "gathering"]);
+  const taken = new Set(["portfolio", "gallery"]);
+  const seenPaths = new Set();
 
   for (const album of albums) {
-    if (!album?.path) continue;
+    if (seenPaths.has(album.path)) continue; // samme galleri via to mapper
+    seenPaths.add(album.path);
+
     const name = windowName(album.path, taken);
     const title = album.name || album.path.split("/").filter(Boolean).pop();
 
