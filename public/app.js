@@ -3,12 +3,9 @@
    Innhold ligger i config.js, galleriet i gallery.js, vinduene i windows.js.
    ========================================================================== */
 
-import { PROJECTS, STRINGS, LOCALES, GATHERING_ALBUM_PATH } from "./config.js";
+import { PROJECTS, STRINGS, LOCALES, GATHERING_ALBUM_PATH, SDOK_FOLDER_PATH } from "./config.js";
 import { createGallery } from "./gallery.js";
-import * as tetris from "./tetris.js";
-import * as minesweeper from "./minesweeper.js";
-import * as pinball from "./pinball.js";
-import * as solitaire from "./solitaire.js";
+import * as sdokGalleries from "./sdok-galleries.js";
 import * as clippy from "./clippy.js";
 import * as windows from "./windows.js";
 
@@ -172,10 +169,7 @@ function applyLanguage(lang) {
   renderProjects(lang);
   gallery.setLanguage(lang);
   gathering.setLanguage(lang);
-  tetris.setLanguage(lang);
-  minesweeper.setLanguage(lang);
-  pinball.setLanguage(lang);
-  solitaire.setLanguage(lang);
+  sdokGalleries.setLanguage(lang);
   clippy.setLanguage(lang);
   updateClock();
   storeLang(lang);
@@ -242,18 +236,14 @@ function init() {
 
   gallery.init();
   gathering.init();
-  tetris.init();
-  minesweeper.init();
-  pinball.init();
-  solitaire.init();
   clippy.init();
 
   windows.init({
-    windows: ["portfolio", "gallery", "gathering", "tetris", "minesweeper", "pinball", "solitaire"],
+    windows: ["portfolio", "gallery", "gathering"],
     onOpen: (name) => {
       if (name === "gallery") gallery.start();
       if (name === "gathering") gathering.start();
-      if (name === "tetris") tetris.start();
+      if (sdokGalleries.has(name)) sdokGalleries.start(name);
     },
     onCloseIntercept: (name) => {
       if (name !== "portfolio") return false;
@@ -263,8 +253,11 @@ function init() {
     },
   });
 
-  // SmugMug-galleriet skal være synlig med det samme, uten å måtte klikke ikonet.
-  windows.open("gallery");
+  // Ett ikon per galleri i SmugMug-mappen. Ikke ventet på — skrivebordet er
+  // klart uansett, ikonene kommer når lista er hentet.
+  sdokGalleries.init(SDOK_FOLDER_PATH).catch((error) => {
+    console.warn("[sdok] kunne ikke bygge galleri-ikoner:", error);
+  });
 
   applyLanguage(readStoredLang());
   initSounds();

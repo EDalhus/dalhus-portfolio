@@ -15,10 +15,6 @@
   },
   // SMUGMUG_API_KEY settes som secret, ikke her:
   //   npx wrangler secret put SMUGMUG_API_KEY
-  "kv_namespaces": [
-    // Lagrer Tetris-highscoren.
-    { "binding": "LEADERBOARD", "id": "6ed37d6dd9f74b9bb091ebcd1876684c" }
-  ],
   "observability": {
     "enabled": true
   }

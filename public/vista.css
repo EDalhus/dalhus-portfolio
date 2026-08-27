@@ -8,9 +8,8 @@
    nødvendig på hver linje.
 
    Skoper seg bevisst til "OS-skallet" (vinduer, knapper, taskbar,
-   Start-meny, skrivebord) — selve spillinnholdet (Tetris-brettet,
-   Minesveiper-cellene, flipperbanen) beholder sin egen retro-palett i
-   begge temaer, det er ikke noe en ekte Vista-maskin ville endret på heller.
+   Start-meny, skrivebord). Galleriinnholdet (bildefliser, forhåndsvisning)
+   arver herfra der det gir mening.
    ========================================================================== */
 
 :root {
@@ -227,22 +226,10 @@ body {
   background: rgba(110, 175, 240, 0.22);
 }
 
-/* --- Faner (Tetris' Poengliste/Spill) -------------------------------------------- */
-
-.tab {
-  border-radius: 6px 6px 0 0;
-  border-color: transparent;
-  background: rgba(255, 255, 255, 0.35);
-  box-shadow: none;
-}
-
-.tab.is-active {
-  background: rgba(255, 255, 255, 0.85);
-  font-weight: 600;
-}
+/* --- Innholdsflate -------------------------------------------------------------- */
 
 .tab-panel {
-  border-radius: 0 0 var(--vista-radius-sm) var(--vista-radius-sm);
+  border-radius: var(--vista-radius-sm);
   background: rgba(255, 255, 255, 0.85);
 }
 

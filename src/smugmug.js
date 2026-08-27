@@ -252,6 +252,75 @@ async function fetchAlbumImages(uris, albumPath, apiKey, count, offset, warnings
 }
 
 /* -------------------------------------------------------------------------
+   Mapper: listen med album (gallerier) i en SmugMug-mappe.
+   Skrivebordet ber om denne for å lage ett ikon per galleri.
+   ------------------------------------------------------------------------- */
+
+/** Som findAlbumImagesUri, men leter etter FolderAlbums i stedet. */
+function findFolderAlbumsUri(response) {
+  const locatorObject = response?.Locator && response[response.Locator];
+  const candidates = [locatorObject, response?.Folder, response?.Node, response].filter(Boolean);
+
+  for (const candidate of candidates) {
+    const albumsUri = uriValue(candidate?.Uris?.FolderAlbums);
+    if (albumsUri) {
+      return {
+        albumsUri,
+        name: candidate.Name || candidate.Title || null,
+        webUri: candidate.WebUri || null,
+      };
+    }
+  }
+  return { albumsUri: null, name: null, webUri: null };
+}
+
+async function fetchFolderAlbums(uris, folderPath, apiKey, warnings, apiRoot, debug) {
+  const lookupUri = uriValue(uris.UrlPathLookup);
+  if (!lookupUri) {
+    warnings.push("Fant ingen UrlPathLookup-URI på denne brukeren.");
+    return { albums: [], folder: null };
+  }
+
+  const data = await getJson(buildUrl(lookupUri, apiKey, { urlpath: folderPath }, apiRoot));
+  const { albumsUri, name, webUri } = findFolderAlbumsUri(data?.Response);
+
+  if (!albumsUri) {
+    warnings.push(`Fant ingen album for mappe-stien ${folderPath}.`);
+    return { albums: [], folder: null, rawLookup: debug ? data : undefined };
+  }
+
+  const listData = await getJson(
+    buildUrl(albumsUri, apiKey, { count: 100, start: 1, _expand: "HighlightImage" }, apiRoot),
+  );
+  const expansions = listData?.Expansions || {};
+  const raw = firstArray(listData?.Response);
+  if (raw.length >= 100) {
+    warnings.push("Mappen har flere enn 100 album — bare de første 100 er tatt med.");
+  }
+
+  const albums = raw
+    .map((album) => {
+      const path = album.UrlPath || null;
+      if (!path) return null;
+      const highlightUri = uriValue(album.Uris?.HighlightImage);
+      const highlight = highlightUri ? expansionPayload(expansions, highlightUri, ["Image"]) : null;
+      const thumb =
+        highlight && typeof highlight.ThumbnailUrl === "string" ? highlight.ThumbnailUrl : null;
+      return {
+        name: album.Name || album.Title || path.split("/").pop(),
+        path,
+        webUri: album.WebUri || null,
+        thumb,
+        imageCount: Number(album.ImageCount) || null,
+        date: album.LastUpdated || album.Date || null,
+      };
+    })
+    .filter(Boolean);
+
+  return { albums, folder: { name, webUri } };
+}
+
+/* -------------------------------------------------------------------------
    Demo-data, brukes når APIKey ikke er satt ennå
    ------------------------------------------------------------------------- */
 
@@ -280,11 +349,13 @@ export async function handleSmugmugRequest(request, env, ctx) {
   const imageCount = clamp(url.searchParams.get("images"), 100, 1, 200);
   const offset = clamp(url.searchParams.get("offset"), 0, 0, 100_000);
   const albumPath = url.searchParams.get("album") || null;
+  const folderPath = url.searchParams.get("folder") || null;
   const debug = url.searchParams.get("debug") === "1";
 
   const cache = caches.default;
   const cacheKeyParts = [`images=${imageCount}`, `offset=${offset}`, `debug=${debug ? 1 : 0}`];
   if (albumPath) cacheKeyParts.push(`album=${encodeURIComponent(albumPath)}`);
+  if (folderPath) cacheKeyParts.push(`folder=${encodeURIComponent(folderPath)}`);
   const cacheKey = new Request(`${url.origin}/api/smugmug?${cacheKeyParts.join("&")}`, {
     method: "GET",
   });
@@ -303,14 +374,46 @@ export async function handleSmugmugRequest(request, env, ctx) {
   let payload;
 
   if (!apiKey || !nickname || nickname === "DITT-BRUKERNAVN") {
-    payload = {
-      source: "demo",
-      reason: !apiKey
-        ? "SMUGMUG_API_KEY er ikke satt (wrangler secret put SMUGMUG_API_KEY)."
-        : "SMUGMUG_NICKNAME er ikke satt i wrangler.jsonc.",
-      ...demoPayload(imageCount, offset),
-      warnings,
-    };
+    const reason = !apiKey
+      ? "SMUGMUG_API_KEY er ikke satt (wrangler secret put SMUGMUG_API_KEY)."
+      : "SMUGMUG_NICKNAME er ikke satt i wrangler.jsonc.";
+    payload = folderPath
+      ? { source: "demo", reason, folder: null, albums: [], warnings }
+      : { source: "demo", reason, ...demoPayload(imageCount, offset), warnings };
+  } else if (folderPath) {
+    try {
+      const { uris } = await fetchUserUris(nickname, apiKey, apiRoot);
+      const result = await fetchFolderAlbums(
+        uris,
+        folderPath,
+        apiKey,
+        warnings,
+        apiRoot,
+        debug,
+      ).catch((error) => {
+        warnings.push(`Mapper: ${error.message}`);
+        return { albums: [], folder: null };
+      });
+
+      payload = {
+        source: "live",
+        nickname,
+        generatedAt: new Date().toISOString(),
+        folder: result.folder,
+        albums: result.albums,
+        warnings,
+        ...(debug ? { availableUris: Object.keys(uris).sort() } : {}),
+        ...(debug && result.rawLookup ? { rawLookup: result.rawLookup } : {}),
+      };
+    } catch (error) {
+      payload = {
+        source: "error",
+        reason: error.message,
+        folder: null,
+        albums: [],
+        warnings,
+      };
+    }
   } else {
     try {
       const { user, uris } = await fetchUserUris(nickname, apiKey, apiRoot);

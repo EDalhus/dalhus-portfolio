@@ -17,11 +17,12 @@ const DEFAULTS = {
   portfolio: { width: 720, height: 520, x: 40, y: 28 },
   gallery: { width: 1400, height: 900, x: 90, y: 30 },
   gathering: { width: 900, height: 700, x: 160, y: 60 },
-  tetris: { width: 460, height: 560, x: 200, y: 60 },
-  minesweeper: { width: 320, height: 420, x: 260, y: 100 },
-  pinball: { width: 580, height: 720, x: 320, y: 20 },
-  solitaire: { width: 720, height: 640, x: 180, y: 40 },
 };
+
+// Vinduer uten en egen oppføring over (de dynamiske SmugMug-galleriene) får
+// dette, trappet litt ned og til høyre etter rekkefølgen de kom i, så de ikke
+// legger seg nøyaktig oppå hverandre.
+const DYNAMIC_DEFAULT = { width: 1100, height: 820, x: 120, y: 30 };
 
 const CORNER_DELTAS = {
   nw: (dx, dy, start) => ({ x: start.x + dx, y: start.y + dy, width: start.width - dx, height: start.height - dy }),
@@ -64,7 +65,15 @@ function taskButtons(name) {
 /* --- Posisjon / størrelse -------------------------------------------------- */
 
 function defaultRect(name) {
-  const base = DEFAULTS[name];
+  let base = DEFAULTS[name];
+  if (!base) {
+    const step = (Math.max(0, names.indexOf(name)) % 6) * 26;
+    base = {
+      ...DYNAMIC_DEFAULT,
+      x: DYNAMIC_DEFAULT.x + step,
+      y: DYNAMIC_DEFAULT.y + step,
+    };
+  }
   const bounds = desktop.getBoundingClientRect();
   const width = Math.min(base.width, Math.max(MIN_WIDTH, bounds.width - EDGE_MARGIN * 2));
   const height = Math.min(base.height, Math.max(MIN_HEIGHT, window.innerHeight - 160));
@@ -299,12 +308,16 @@ function attachResize(name) {
 /* --- Skrivebordsikoner --------------------------------------------------------- */
 
 function attachDesktopIcons() {
-  for (const icon of $$(".desktop-icon")) {
-    icon.addEventListener("click", () => {
-      for (const other of $$(".desktop-icon")) other.classList.toggle("is-selected", other === icon);
-      open(icon.dataset.iconTarget);
-    });
-  }
+  // Delegert, så ikoner som legges til senere (de dynamiske SmugMug-galleriene)
+  // virker uten at de må kobles opp enkeltvis.
+  const container = $(".desktop-icons");
+  if (!container) return;
+  container.addEventListener("click", (event) => {
+    const icon = event.target.closest(".desktop-icon");
+    if (!icon || !container.contains(icon)) return;
+    for (const other of $$(".desktop-icon")) other.classList.toggle("is-selected", other === icon);
+    open(icon.dataset.iconTarget);
+  });
 }
 
 /* --- Start-meny ----------------------------------------------------------------- */
@@ -321,12 +334,12 @@ function attachStartMenu() {
     startButton.setAttribute("aria-expanded", String(willOpen));
   });
 
-  for (const item of $$(".start-menu-item", startMenu)) {
-    item.addEventListener("click", () => {
-      open(item.dataset.windowTarget);
-      closeStartMenu();
-    });
-  }
+  startMenu.addEventListener("click", (event) => {
+    const item = event.target.closest(".start-menu-item");
+    if (!item) return;
+    open(item.dataset.windowTarget);
+    closeStartMenu();
+  });
 
   document.addEventListener("pointerdown", (event) => {
     if (startMenu.hidden) return;
@@ -355,33 +368,41 @@ function syncDesktopMode() {
   }
 }
 
+/**
+ * Kobler opp ett vindu: knappene i tittellinjen, dra, endre størrelse og den
+ * tilhørende oppgavelinje-knappen. Trygg å kalle etter init() også — de
+ * dynamiske SmugMug-galleriene bruker den når seksjonen deres er lagt i DOM.
+ */
+export function mountWindow(name) {
+  const win = windowEl(name);
+  if (!win || names.includes(name)) return;
+  names.push(name);
+  openState.set(name, false);
+  runningState.set(name, false);
+
+  for (const button of taskButtons(name)) {
+    button.hidden = true;
+    button.addEventListener("click", () => toggle(name));
+  }
+
+  win.querySelector('[data-action="minimize"]')?.addEventListener("click", () => minimize(name));
+  win.querySelector('[data-action="maximize"]')?.addEventListener("click", () => toggleMaximize(name));
+  win.querySelector('[data-action="close"]')?.addEventListener("click", () => close(name));
+  win.addEventListener("pointerdown", () => focus(name));
+
+  attachDrag(name);
+  attachResize(name);
+}
+
 export function init({ windows, onOpen: onOpenHandler, onCloseIntercept: onCloseHandler }) {
-  names = windows;
+  names = [];
   desktop = $(".desktop");
   startButton = $("#start-button");
   startMenu = $("#start-menu");
   onOpen = onOpenHandler || onOpen;
   onCloseIntercept = onCloseHandler || onCloseIntercept;
 
-  for (const name of names) {
-    const win = windowEl(name);
-    if (!win) continue;
-    openState.set(name, false);
-    runningState.set(name, false);
-    for (const button of taskButtons(name)) button.hidden = true;
-
-    win.querySelector('[data-action="minimize"]')?.addEventListener("click", () => minimize(name));
-    win.querySelector('[data-action="maximize"]')?.addEventListener("click", () => toggleMaximize(name));
-    win.querySelector('[data-action="close"]')?.addEventListener("click", () => close(name));
-    win.addEventListener("pointerdown", () => focus(name));
-
-    attachDrag(name);
-    attachResize(name);
-  }
-
-  for (const button of $$(".taskbar-apps [data-window-target]")) {
-    button.addEventListener("click", () => toggle(button.dataset.windowTarget));
-  }
+  for (const name of windows) mountWindow(name);
 
   attachDesktopIcons();
   attachStartMenu();

@@ -1,10 +1,9 @@
 # dalhus-portfolio
 
 Statisk porteføljeside i Windows 95-stil, servert fra Cloudflare Workers med
-[Static Assets](https://developers.cloudflare.com/workers/static-assets/), med
-et SmugMug-galleri, et Tetris-spill med offentlig highscore-liste (server-side
-i Worker-en), og Minesveiper + et enkelt flipperspill som begge kjører helt
-lokalt i nettleseren.
+[Static Assets](https://developers.cloudflare.com/workers/static-assets/). Et
+SmugMug-galleri med kontoens siste bilder, et eget vindu for The Gathering
+2026, og ett skrivebordsikon per galleri i en valgt SmugMug-mappe.
 
 Ingen byggesteg, ingen rammeverk, ingen avhengigheter i nettleseren.
 
@@ -12,25 +11,24 @@ Ingen byggesteg, ingen rammeverk, ingen avhengigheter i nettleseren.
 
 ```
 .
-├── wrangler.jsonc        # Worker-config: assets, vars, KV, 404-håndtering
+├── wrangler.jsonc        # Worker-config: assets, vars, 404-håndtering
 ├── .dev.vars.example     # Mal for lokale hemmeligheter
 ├── src/
-│   ├── index.js          # Ruting: /healthz, /api/smugmug, /api/leaderboard, ellers assets
-│   ├── smugmug.js        # SmugMug-henting, normalisering og caching
-│   └── leaderboard.js    # Tetris-highscore i Workers KV
+│   ├── index.js          # Ruting: /healthz, /api/smugmug, ellers assets
+│   └── smugmug.js        # SmugMug-henting, normalisering og caching
 └── public/               # Serveres statisk fra Cloudflares edge
     ├── index.html
     ├── styles.css        # Hele Win95-temaet (standard)
     ├── vista.css         # Windows Vista/Aero-tema — lastes disabled, se «Tema»
-    ├── config.js         # Prosjekter, tekster, galleri-/Tetris-innstillinger
+    ├── config.js         # Prosjekter, tekster, galleri-innstillinger, SmugMug-mappe
     ├── app.js            # Skall: språk, tema, klokke, klikkelyder
     ├── windows.js        # Vindusbehandler: åpne/dra/endre størrelse, Start-meny
-    ├── gallery.js        # createGallery() — driver både SmugMug- og The Gathering-vinduet
-    ├── tetris.js         # Spillmotor + highscore-liste
-    ├── minesweeper.js    # Klassisk Minesveiper, helt lokalt
-    ├── pinball.js        # Enkelt flipperspill med 2D-fysikk
+    ├── gallery.js        # createGallery() — driver hvert galleri-vindu
+    ├── sdok-galleries.js # Ett ikon + vindu per galleri i SmugMug-mappen
+    ├── clippy.js         # Clippy-widgeten
     ├── _headers          # Sikkerhetsheadere for de statiske filene
     ├── 404.html
+    ├── clippy.png
     └── favicon.svg
 ```
 
@@ -78,7 +76,9 @@ plassholdere, slik at alt fungerer før nøkkelen er på plass.
 
 ```
 GET /api/smugmug?images=100&offset=0
-GET /api/smugmug?debug=1        # tar med hvilke URI-er kontoen tilbyr
+GET /api/smugmug?album=/FA/KANDU/TG26H   # ett bestemt album
+GET /api/smugmug?folder=/FA/SDOK         # listen med gallerier i en mappe
+GET /api/smugmug?debug=1                 # tar med hvilke URI-er kontoen tilbyr
 ```
 
 Svaret er trimmet ned til:
@@ -136,21 +136,42 @@ Worker-en slår den opp via kontoens `UrlPathLookup`-URI for å finne
 albumets `AlbumImages`-lenke, og henter/paginerer derfra på samme måte som
 `UserRecentImages`. Svaret får i tillegg et `album: { title, webUri }`-felt.
 
-**Testet kun i demo-modus herfra** — jeg har ikke en ekte `SMUGMUG_API_KEY`
-tilgjengelig i dette miljøet, så `UrlPathLookup`-oppslaget (`findAlbumImagesUri`
-i `src/smugmug.js`) er skrevet defensivt ut fra hvordan resten av SmugMug-APIet
-oppfører seg, men ikke verifisert mot et ekte svar. Fungerer ikke
-«The Gathering 2026»-vinduet når det er deployet: kall
-`/api/smugmug?album=/FA/KANDU/TG26H&debug=1` og se på `warnings`.
+### Galleriene i en mappe (`?folder=`)
+
+```
+GET /api/smugmug?folder=/FA/SDOK
+```
+
+Slår opp mappe-stien via `UrlPathLookup`, følger `FolderAlbums`-lenken, og
+returnerer ett innslag per galleri i mappen:
+
+```jsonc
+{
+  "source": "live",
+  "folder": { "name": "SDOK", "webUri": "https://…/FA/SDOK" },
+  "albums": [
+    { "name", "path", "webUri", "thumb", "imageCount", "date" }
+  ],
+  "warnings": []
+}
+```
+
+`public/sdok-galleries.js` kaller dette ved lasting og bygger ett
+skrivebordsikon + galleri-vindu per `albums`-innslag (mappen er satt som
+`SDOK_FOLDER_PATH` i `public/config.js`). Legger du til et galleri i
+SmugMug-mappen, dukker ikonet opp av seg selv neste gang siden lastes —
+ingenting å redigere. `!albums` er rekursiv, så gallerier i eventuelle
+undermapper havner også i lista.
 
 ## Skrivebordet
 
 Over 520px bredde oppfører vinduene seg som ekte Windows 95-vinduer:
 
-- Skrivebordsikonene («Portfolio», «SmugMug», «The Gathering 2026», «Tetris»,
-  «Minesveiper», «3D Flipperspill», «Kabal») åpner vinduene — de er lukket til
-  man klikker, bortsett fra SmugMug-galleriet som åpnes automatisk med det
-  samme siden lastes.
+- Skrivebordsikonene åpner vinduene. Faste ikoner: «Portefølje», «SmugMug»
+  (kontoens siste bilder) og «The Gathering 2026». I tillegg ett ikon per
+  galleri i SmugMug-mappen (se `?folder=` over).
+- Ingenting åpnes automatisk — siden viser bare skrivebordet med ikonene, og
+  man velger selv hva som skal åpnes.
 - Tittellinjen kan dras for å flytte vinduet.
 - Hjørnene kan dras for å endre størrelse (minimum ca. 280×220px).
 - Start-knappen åpner en Start-meny som henger fast over oppgavelinjen og
@@ -159,40 +180,6 @@ Over 520px bredde oppfører vinduene seg som ekte Windows 95-vinduer:
 
 Under 520px faller alt tilbake til vanlig, stablet dokumentflyt uten dra/
 endre størrelse — logikken for dette ligger i `public/windows.js`.
-
-## Tetris
-
-Et lite Tetris-spill i vinduet, med en offentlig highscore-liste som lagres
-i Workers KV.
-
-- Åpner du vinduet vises **Poengliste**-fanen først — topplisten er synlig
-  for alle besøkende med det samme, uten å måtte spille.
-- **Spill**-fanen ber om et navn (lagres i `localStorage`, forhåndsutfylt
-  neste gang) før man kan starte.
-- Styring: piltaster for å flytte/rotere, mellomrom for hard drop, `P` for
-  pause. På skjermer under 520px vises knapper for berøring i stedet.
-- Når spillet er over sendes poengsummen automatisk til
-  `/api/leaderboard`, og lista friskes opp.
-
-### Sett opp highscore-lagring (Workers KV)
-
-Highscore-endepunktet trenger en KV-namespace. Uten en ekte en kjører
-`npm run dev` fint (wrangler simulerer den lokalt), men `wrangler deploy`
-feiler.
-
-```bash
-npx wrangler kv namespace create LEADERBOARD
-```
-
-Lim inn `id`-en du får tilbake i `wrangler.jsonc` under `kv_namespaces`.
-
-### Viktig: dette er et åpent, ikke-autentisert endepunkt
-
-`/api/leaderboard` validerer at poengsummen er et rimelig tall og saniterer
-navnet, men det finnes ingen server-side verifisering av at scoren faktisk
-ble spilt — hvem som helst kan POSTe en falsk highscore direkte mot
-endepunktet. Helt greit for en portefølje-lekeplass, men ikke bygg videre på
-dette uten å tenke gjennom det hvis det noen gang blir mer enn det.
 
 ## Tema
 
@@ -212,48 +199,13 @@ neste besøk.
 `disabled` fra start. `applyTheme()` i `public/app.js` slår den av/på via
 `link.disabled` — siden den ligger etter `styles.css` i dokumentet, trumfer
 reglene der de vanlige Win95-reglene med samme selektor når den er aktiv,
-uten at noe trenger et `[data-theme]`-prefiks. Temaet er bevisst avgrenset
-til selve "OS-skallet" (vinduer, knapper, taskbar, Start-meny, skrivebord)
-— spillinnholdet (Tetris-brettet, Minesveiper-cellene, flipperbanen)
-beholder sin egen retro-palett i begge temaer.
+uten at noe trenger et `[data-theme]`-prefiks. Temaet er avgrenset til selve
+"OS-skallet" (vinduer, knapper, taskbar, Start-meny, skrivebord); galleri-
+innholdet arver herfra der det gir mening.
 
 Vil du legge til et tredje tema, følg samme oppskrift: en ny
 `public/<navn>.css`, en ny `<link ... disabled>` i `index.html`, og en
 gren til i `applyTheme()`.
-
-## Minesveiper
-
-Klassisk Minesveiper (`public/minesweeper.js`), helt lokalt — ingen
-server-data, ingen highscore. Nybegynner/Middels/Ekspert bytter brettstørrelse,
-venstreklikk avdekker (og "chorder" et avdekket tall hvis nok flagg står
-rundt det), høyreklikk flagger. "Flagg-modus"-knappen bytter venstreklikk
-til å flagge i stedet, for mobil uten høyreklikk.
-
-## Flipperspill
-
-Et enkelt flipperspill (`public/pinball.js`) med ekte 2D-fysikk — tyngdekraft,
-veggkollisjon, bumpere som gir et "kick", og flippere som gir ballen fart
-basert på hvor fort de svinger når de treffer den (ikke bare et fast reflekt).
-Dette er en **v1 med et originaltegnet baneoppsett** — ingen grafikk fra det
-klassiske "3D Pinball for Windows – Space Cadet" er brukt. Styring: piltaster
-for flipperne, mellomrom for å lade og skyte ut ballen, `P` for pause.
-
-Banens vegger er definert som en liste linjesegmenter i `WALLS`
-(`public/pinball.js`) — brettet er tegnet for hånd som koordinater, ikke
-importert fra noe sted. Vil du justere formen, er det her du gjør det; pass på
-at hvert segment faktisk møter det neste (et gap, selv på under en pikselbredde
-mellom to vegger, lar ballen falle rett gjennom).
-
-## Kabal
-
-Klassisk Klondike-kabal (`public/solitaire.js`), helt lokalt — ingen
-server-data. Interaksjonen er trykk-for-å-velge / trykk-for-å-flytte i stedet
-for dra-og-slipp, slik at den fungerer likt med mus og touch: klikk et kort
-(eller en gyldig sekvens øverst i en tablå-kolonne) for å velge det, klikk så
-en fundament- eller tablå-bunke for å flytte det dit. Dobbeltklikk et kort
-sender det automatisk til et fundament hvis det er et gyldig trekk. Klikk
-stokken for å trekke, eller for å stokke kastebunken tilbake når stokken er
-tom.
 
 ## Clippy
 
