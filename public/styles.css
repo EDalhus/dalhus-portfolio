@@ -719,7 +719,10 @@ body {
   position: absolute;
   left: 3px;
   bottom: calc(100% + 3px);
-  width: 200px;
+  /* Bredden følger den lengste oppføringen, i stedet for å bryte teksten. */
+  width: max-content;
+  min-width: 200px;
+  max-width: calc(100vw - 8px);
   background: var(--w95-face);
   padding: 3px;
   border: 1px solid;
@@ -755,7 +758,15 @@ body {
   font-size: 13px;
   color: var(--w95-text);
   text-align: left;
+  white-space: nowrap;
   cursor: pointer;
+}
+
+/* Én linje per oppføring — menyen utvider seg heller i bredden. */
+.start-menu-item > span:last-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .start-menu-item:hover,
